@@ -1,0 +1,10 @@
+Make sure you are in root (cd ..)
+turn of debugger
+mvn clean package -Pprod
+How to run webapp from command-line:
+ 1) Build the webapp
+        mvn clean package -Pprod
+ 
+ 2) run the nccs webapp
+       java -jar backend\target\backend..... 
+       java -jar admin-backend\target\admin-backend-1.0-SNAPSHOT-exec.jar --server.port=8081 (this is a spring property to override)
