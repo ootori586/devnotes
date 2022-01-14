@@ -1,0 +1,24 @@
+Problem:  I'm in this large webapp and I need to view my page 
+		  -- I need to know the route for this page
+
+
+Solution:
+  1. Go to the TypeScript class that I am changing
+
+  2. Go to the line that has "export class..."
+
+           export class MyComponent
+                            --> right click on MyComponent -> Find Usage
+
+
+  3. In the Find window, look for the app.module.ts 
+	 -- MyComponent will be listed twice  (once for the import and one for the route)
+	 -- Go to the 2nd one:  That has the route
+
+  4. Look for the path:
+	 -- If the path is a constant, then press Control-Click on that contant
+	 -- You will see the route
+
+
+  5. In your browser, go to that route
+     http://localhost:4200/page/stuff/this/that
