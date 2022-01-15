@@ -1,0 +1,19 @@
+1. Configure your Intellij to so that it knows that the sync-service is a maven module 
+    a. Startup Intellij
+    b. Open the nccs project
+    c. In the project explorer, go to sync-sevice / pom.xml
+    d. right-click on the pom.xml -> Maven -> Add as Maven Project
+       NOTE:  If you do not see this option, then skip this step
+
+ 2. Configure your Intellij to run the SyncService and wipe database
+    a. In the project explorer, go to this directory:   sync-service/src/main/java/com/lessons/sync
+    b. Right-click on SyncApplication -> Debug 'SyncApplication
+    c. Pull Run -> Edit Configurations
+       1) Single-click on the "SyncApplication" and press Control-D  (to duplicate it)
+       2) Rename the duplicate from "SyncApplication (1)" to   "SyncApplication with flyway clean)"
+       3) Add this option to VM options:  -Dapp.datasource.flyway-clean-on-startup=true
+       4) Press OK
+
+       -- Now, you should 2 debug options:
+             "SyncApplications"                 will re-create your ES indeces
+             "SyncApplication w/flyway clean    will empty your database and re-create empty ES indeces
