@@ -1,0 +1,9 @@
+Go to database in intelliJ
+click on Database
+go to tables
+go to users and double click on users
+a line of database info in a table will open and you will navigate to the "registration state" and
+replace the number 1 with a three.
+Then hit ctrl + enter (or left arrow) to commit change.
+Go to browser and type in localhost:4200
+this bypasses the registration step in NCCS
