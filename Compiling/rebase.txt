@@ -1,7 +1,7 @@
 in intellij terminal type >git branch -D development (This deletes the current local development branch)
 next, type >git fetch --all in the terminal (This gets the current branches)
 Next, type >git checkout development (This re-checkout the development locally)
-Switch back to you branch that you are currently working on by typing >git checkout -b "name of your branch"
+Switch back to you branch that you are currently working on by typing >git checkout "name of your branch"
 In intellij, select "Git" from the tool bar and scroll down and select "rebase" from the dropdown
 *****NOTE Force push used at any other time is dangerous. You are teling intellij that it is okay to overwrite what is currently in gitlab with what you have on your local machine
 *****so anything that was commited (someone working in your branch) will get blown away******
