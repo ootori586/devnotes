@@ -1,0 +1,9 @@
+### Ignore Intellij specific files ###
+.idea/*
+*.iml
+
+## Ignore File-based project format:
+*.iws
+
+## Ignore compiled files in the target directory
+/target/
