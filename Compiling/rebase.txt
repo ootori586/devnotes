@@ -1,8 +1,41 @@
-in intellij terminal type >git branch -D development (This deletes the current local development branch)
-next, type >git fetch --all in the terminal (This gets the current branches)
-Next, type >git checkout development (This re-checkout the development locally)
-Switch back to you branch that you are currently working on by typing >git checkout "name of your branch"
-In intellij, select "Git" from the tool bar and scroll down and select "rebase" from the dropdown
-*****NOTE Force push used at any other time is dangerous. You are teling intellij that it is okay to overwrite what is currently in gitlab with what you have on your local machine
-*****so anything that was commited (someone working in your branch) will get blown away******
-If there are conflicts, intellij will display a merge window for you to compare and resolve
+How to Rebase With Intellij
+---------------------------
+
+
+References
+----------
+http://blog.jessitron.com/2012/10/git-rebase-inside-intellij-idea.html
+
+
+Procedure
+---------
+ 1. Get the latest development branch   (the branch with other people's changes -- could be "master" or "development")
+    unix> git branch -D development       # Delete the development branch
+    unix> git fetch -a                    # Get the latest development branch
+    unix> git checkout development
+
+ 2. Checkout to your local branch
+ 
+ 3. In Intellij, Pull VCS -> Git -> Rebase
+ 
+ 4. In the popup
+    a. Uncheck "Interactive"
+    b. In the "onto", choose development (or the branch with other people's changes)
+    c. Click "Rebase"
+
+ 5. Resolve conflicts (if there are any)
+
+ 6. Do a "force push"
+    In Intellij, Pull VCS -> Git -> Push -> Force Push
+    *OR*
+    unix> git push -f    # This will perform a “force push”, which will push your rebased local branch performing the additional merge
+
+    NOTE:  If you do a git status, Git will tell you to do a "pull"
+    -- **DO NOT DO A PULL**
+    -- THis will cause a second copy of your commits to appear in the history
+
+
+    THis is the exception to the “always pull, then push” rule.
+    When you rebase, you’re creating a copy of your commit history. 
+    Git treats this new copy of history as a completely different set of commits (because it is).
+  
