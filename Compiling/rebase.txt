@@ -16,17 +16,16 @@ Procedure
 
  2. Checkout to your local branch
  
- 3. In Intellij, Pull VCS -> Git -> Rebase
+ 3. In Intellij,-> Git -> Rebase
  
  4. In the popup
-    a. Uncheck "Interactive"
-    b. In the "onto", choose development (or the branch with other people's changes)
-    c. Click "Rebase"
+    a. type in development
+    b. Click "Rebase"
 
  5. Resolve conflicts (if there are any)
 
  6. Do a "force push"
-    In Intellij, Pull VCS -> Git -> Push -> Force Push
+    In Intellij, -> Git -> Push -> Force Push
     *OR*
     unix> git push -f    # This will perform a “force push”, which will push your rebased local branch performing the additional merge
 
