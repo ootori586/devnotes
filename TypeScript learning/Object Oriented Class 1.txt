@@ -1,0 +1,45 @@
+What you learned
+	----------------
+	1. when you do not give it an initial value or null, it's undefined
+
+	2. let stays in the scope
+		-- let cannot be used outside of a method
+		-- defines a variable within the { }
+
+	3. there are 2 options to creating an instance of a class
+		-- option 2, you use curly braces requires ALL of the fields to be defined to be used
+
+	4. null and undefined is a pain in the ass!!
+
+	5. how to make a variable using let
+
+	6. We use console.log to "print" stuff to the web browser's console
+
+	7. DTO stands for data transfer object
+		-- it's an envelope
+		-- carry lots of things in one variable
+
+	8. Calling arguments from one method to another
+
+		this.method();
+
+		this.method1("hi mom", 27);
+
+
+
+	Basics
+	------
+	1. How to work with variables
+	2. How to work with objects
+	3. How to pass things around
+	4. What to watch out for -- landmines:  null vs undefined stuff
+	   How to use objects correctly
+
+	5. Arrow functions
+
+
+		() => {    }
+
+		(data: Model1DTO) => {
+
+		}
