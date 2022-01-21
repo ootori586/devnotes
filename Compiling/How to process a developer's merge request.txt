@@ -1,54 +1,21 @@
-1. Checkout this branch
-    unix> cd ~/intellijProjects/nccs
-    unix> git fetch -a
-    unix> git checkout -f jag/reviewers-table
+1. Checkout the Dev's branch
+>cd .. *make sure you are in parent directory*
+>git fetch -a
+>git checkout - f *dev's branch name **copy paste from MR**
 
- 2. Build the NCCS webapp (to run locally)
-    unix> cd db-migrations
-    unix> mvn flyway:clean
-	unix> mvn flyway:migrate
-    unix> cd ..
+2. Build the RDA *run sync app flyway*
+>mvn clean package -Pprod -PbuildRda
 
- 3. Build the nccs webapp  (cd to frontend)
-    unix> mvn clean package -Pprod **make sure you are in frontend end**
+3.start up putty and get the tunnel
+  -
 
+4. start firefox and start the RDA deployer
 
- 4. Run the NCCS webapp locally **go back to the parent directory cd..**
-    unix> java -jar ./backend/target/backend-1.0-SNAPSHOT-exec.jar
+5.Deploy the NCCS RDA to dev bdp
+ a. search for the NCCS RDA and delete it
+ b. upload the nccs.web.app.rda zip file found in the intellij terminal 'Building zip'*copy/paste*
+ c.deploy the RDA/select NCCS
+ d. start-up NCCS Sync web app ***wait until it says running***
+ e. start-up NCCS web app ***wait until it says running***
+ f. Start-up NCCS Admin web App ***wait until it says running***
 
- 5. View the webapp in your browser (http://localhost:8080/nccs)
-
-
-Part 2: Deploy it to the DEV Cluster
--------------------------------------
- 9. Checkout this branch
-    unix> cd ~/intellijProjects/nccs
-    unix> git fetch -a
-    unix> git checkout -f jag/reviewers-table
-
- 10. Build the RDA
-    unix> mvn clean package -Pprod -PbuildRda
-
- 11. Deploy the NCCS RDA to the dev bdp
-    a. Delete the existing NCCS RDA  (if it is found)
-    b. Upload the nccs.webapp.rda.zip file (found in install-bdp/target/)
-    c. Deploy the RDA
-    d. Start-up the NCCS web app
-    e. Start-up the NCCS Admin web app
-
- 12. View the webapp in your browser (https://10.1.21.107/nccs)
-    - Go through the registration process
-
- 13. View the admin webapp in your browser (https://10.1.21.107/nccs-admin)
-    - approve yourself
-
- 14. Go through with filling out the form "Originate > Prime" and submit
-
- 15. Go to "Reviewer > Pending Review List"
-     a. click the edit button
-
- 16. Go to "Reviewers" Tab
-    a. Verify that these fields are displayed
-          1. Status
-          2. Action Date
-          3. #
