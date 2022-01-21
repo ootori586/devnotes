@@ -19,3 +19,8 @@
  e. start-up NCCS web app ***wait until it says running***
  f. Start-up NCCS Admin web App ***wait until it says running***
 
+ 6.follow Dev's procedures
+
+ 7. After testing is done and no issues, go to gitlab and select merge
+ 8. Send message in teams ***Done with NCCS/DAS BDP, Merged ...ticket, please rebase***
+
