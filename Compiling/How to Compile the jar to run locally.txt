@@ -3,7 +3,7 @@ turn of debugger
 mvn clean package -Pprod
 How to run webapp from command-line:
  1) Build the webapp
-        mvn clean package -Pprod
+        mvn clean package -Pprod -DskipTests (stop debugger)
  
  2) run the nccs webapp
        java -jar backend\target\backend-1.0-SNAPSHOT-exec.jar
