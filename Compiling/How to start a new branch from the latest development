@@ -1,0 +1,21 @@
+How to start a new branch from the latest development
+-----------------------------------------------------
+
+Procedure
+---------
+ 1. Destroy my existing branch
+    unix> git branch -D development
+
+ 2. Fetch new stuff
+    unix> git fetch -a
+
+ 3. Checkout development
+    unix> git checkout development
+
+ 4. Create a new branch from where I am
+    unix> git checkout -b my-new-branch
+
+
+    At this point, I am ready to code in my new branch
+
+

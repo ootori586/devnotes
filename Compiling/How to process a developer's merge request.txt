@@ -14,10 +14,11 @@
 5.Deploy the NCCS RDA to dev bdp
  a. search for the NCCS RDA and delete it
  b. upload the nccs.web.app.rda zip file found in the intellij terminal 'Building zip'*copy/paste*
- c.deploy the RDA/select NCCS
- d. start-up NCCS Sync web app ***wait until it says running***
- e. start-up NCCS web app ***wait until it says running***
- f. Start-up NCCS Admin web App ***wait until it says running***
+ c.deploy the RDA
+ d.select NCCS
+ e. start-up NCCS Sync web app ***wait until it says running***
+ f. start-up NCCS web app ***wait until it says running***
+ g. Start-up NCCS Admin web App ***wait until it says running***
 
  6.follow Dev's procedures
 
