@@ -1,0 +1,18 @@
+How to Reset Everything on the dev cluster
+------------------------------------------
+Problem:  I want to empty the database and ES and reset everything on a cluster
+
+
+Procedure
+---------
+ 1. Use the RDA deployer to restart the sync-service
+
+ 2. Use the RDA deployer to restart the nccs webapp
+
+ 3. Use the RDA deployer to restart the nccs-admin webapp
+
+ 4. Close your entire browser
+
+ 5. Open a new browser and connect to the nccs webapp
+    on dev cluster:  https://10.1.21.7/nccs
+

@@ -1,0 +1,47 @@
+How to build a REST endpoint in Spring Boot
+-------------------------------------------
+ 1. Understand the contract **FIRST**
+	-- What is the REST call taking-in from the front-end?
+	-- What is the REST call returning to the front-end?
+    -- What is the REST call type?  GET / POST / PUT / DELETE
+	-- What is the url
+
+	If it's a readonly REST endpoint, in general we use the GET type
+
+		GET /api/banners/classified
+
+
+
+		What is passed-in to this REST endpoint?       **NOTHING**
+
+		What is returned from this REST endpoint?
+			ClassifiedBannerDTO object
+				inside was a string called "banner_mode"
+
+
+	On the backend, we need a java DTO object that mirrors the front-end DTO object
+
+
+
+ 2. We need to create the back-end model object
+	-- If it's called ClassifiedBannerDTO on the front-end
+	   Then use the same name on the backend
+
+	-- If it has a string on the front-end
+	-- Then add a string on the back-end
+
+
+
+
+ 3. We need to create our REST endpoint itself
+	-- This is a public method in a Controller class
+
+
+
+ 4. We have to implement what the REST endpoint does
+	a. Get the banner mode from the property file
+	b. Create a ClassifiedBannerDTO object
+	c. Store the banner mode in the ClassifiedBannerDTO object
+	d. Return the ClassifiedBannerDTO object back to the front-end
+
+

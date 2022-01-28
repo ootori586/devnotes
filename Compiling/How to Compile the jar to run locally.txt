@@ -2,6 +2,8 @@ Make sure you are in root (cd ..)
 turn of debugger
 mvn clean package -Pprod
 How to run webapp from command-line:
+This will build both web apps (nccs web app and admin web app)
+
  1) Build the webapp
         mvn clean package -Pprod -DskipTests (stop debugger)
  

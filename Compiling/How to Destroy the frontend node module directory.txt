@@ -1,0 +1,4 @@
+If intellij starts giving you weird errors, but the app still runs, try this.
+1.navigate to the frontend in the file explorer and click on package.json and delete it.
+
+ask about next step
