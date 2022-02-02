@@ -1,0 +1,43 @@
+
+How to add the classification banner to the admin-webapp
+--------------------------------------------------------
+
+
+Design Document
+---------------
+ 1. Front-end:
+
+	1. create a model that holds the stuff for the rest end point is returning (ClassifiedBannerDTO)* banner_mode *string*
+
+	2. Need a banner.service.ts that will invoke the REST call (generate the service)
+
+        3.-- Create a public method to return an observable (to get that mode) getClassifiedBanner(): Observable<ClassifiedBannerDTO>
+			   (with hard-coded data for now)     FAKE SERVICE *returns fake stuff*
+
+
+	4. Need to show the classification on the front-end  (by adding to app.component.html) *inject the banner service into the
+			app.component.ts*
+
+	5. Invoke the banner service REST call.
+		--add a public observable as a class variable
+		--we use the banner service to initialize the observable
+		--on the HTML side we will use the async pipe to invoke the REST call
+
+	6. Using the the data from the async pipe we can show the classified banner * if statements*
+		if mode==cui, then show CUI banner
+						   if mode=demo, then show demo banner
+						   if mode==off, then show **nothing**
+
+	7. Back-end: Need a REST call to the nccs-admin backend to get the demo/off/cui "mode"
+	a. Add the real REST endpoint
+	b. Change the banner.service.ts to invoke it for REAL
+
+	8. Modify the other pages to adjust their calcs based on the height
+
+
+
+
+
+
+
+
