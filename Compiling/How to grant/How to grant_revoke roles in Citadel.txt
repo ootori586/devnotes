@@ -1,0 +1,16 @@
+ How to grant/revoke roles
+    -------------------------
+    1. ssh to the puppet master and become root
+       ssh puppet master
+       unix> sudo -s
+
+    2. List all users (to find the user you are looking for)
+       unix> citadel user:list
+
+    3. Revoke a role
+       unix> export USERNAME=my-user-name
+       unix> citadel attribute:delete -u $USERNAME -a ROLE:ROLE_TO_BE_REMOVED
+
+    4. Grant a role
+       unix> export USERNAME=my-user-name
+       unix> citadel attribute:add -u $USERNAME -a ROLE:ROLE_TO_BE_ADDED
