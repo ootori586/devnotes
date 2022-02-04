@@ -1,1 +1,37 @@
 
+Checkout my branch
+    unix> cd ~/intellijProjects/nccs
+    unix> git fetch -a
+    unix> git checkout -f ma/admin-cert-banner
+
+ 2. Empty your local database
+    unix> cd db-migrations
+    unix> mvn flyway:clean
+    unix> mvn flyway:migrate
+    unix> cd ..
+
+ 3. Build the nccs rda
+    unix> mvn clean package -Pprod -PbuildRda
+
+ 4. Deploy the nccs rda to the dev cluster
+    a. Delete the existing nccs RDA
+    b. Upload the RDA
+    c. Deploy the RDA
+
+    d. Verify that the sync-service has this configuration:
+          java -Xms2000m -Xmx2000m  -Dapp.datasource.flyway-clean-on-startup=TRUE  -Dsync.syncTreeGridInfo=TRUE  -jar sync-service/sync-service-exec.jar  --spring.config.location=./application.yaml
+
+    e. Verify that the nccs webapp has this configuration:
+          java -Djava.io.tmpdir=./  -Xms3000m -Xmx3000m -jar webapp/backend-exec.jar --server.port=${HTTPS_PORT}   --spring.config.location=./application.yaml
+
+    f. Verify that the nccs-admin webapp has this configuration:
+         java -Djava.io.tmpdir=.  -jar admin-webapp/backend-exec.jar --server.port=${HTTPS_PORT}  --spring.config.location=./application.yaml
+
+    g. Startup the nccs sync-service **FIRST**
+       -- Wait for it to startup completely
+
+    h. Startup the nccs webapp  **SECOND**
+       -- Wait for to startup completely
+
+    i. Startup the nccs-admin webapp **THIRD**
+       -- Wait for it to startup completely

@@ -5,12 +5,16 @@
        unix> sudo -s
 
     2. List all users (to find the user you are looking for)
-       unix> citadel user:list
+       unix> citadel user:list //check to make sure your user name is in the list
 
-    3. Revoke a role
+    3. List all Roles for a user
+       unix> export USERNAME=YOURUSERNAME
+       unix> citadel user:get -u $USERNAME   //to get a list of all your user roles
+
+    4. Revoke a role
        unix> export USERNAME=my-user-name
        unix> citadel attribute:delete -u $USERNAME -a ROLE:ROLE_TO_BE_REMOVED
 
-    4. Grant a role
+    5. Grant a role
        unix> export USERNAME=my-user-name
        unix> citadel attribute:add -u $USERNAME -a ROLE:ROLE_TO_BE_ADDED

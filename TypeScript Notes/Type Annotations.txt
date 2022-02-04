@@ -1,0 +1,64 @@
+What is Type Annotation in TypeScript
+TypeScript uses type annotations to explicitly specify types for identifiers such variables, functions, objects, etc.
+
+TypeScript uses the syntax : type after an identifier as the type annotation, where type can be any valid type.
+
+Once an identifier is annotated with a type, it can be used as that type only.
+If the identifier is used as a different type, the TypeScript compiler will issue an error.
+---------------------------------------------------------------------------------------
+Type annotations in variables and constants
+The following syntax shows how to specify type annotations for variables and constants:
+*******************************************************
+let variableName: type;
+let variableName: type = value;
+const constantName: type = value;
+
+Example*
+let counter: number;  //number annotation for variable
+
+counter = 1;  //assigning a number to the counter variable
+
+let counter: number = 1; //type annotation and initializing it in the same statement
+*****************************************************************************************************
+
+Type annotation examples
+-------------------------
+Arrays
+=======
+To annotate an array type you use use a specific type followed by a square bracket : type[] :
+*************************
+let arrayName: type[];
+*************************
+
+For example, the following declares an array of strings:
+******************************************************************
+let names: string[] = ['John', 'Jane', 'Peter', 'David', 'Mary']; //all data in array must match primitive data type
+******************************************************************
+
+Objects
+=======
+To specify a type for an object, you use the object type annotation. For example:
+***********************
+let person: {
+   name: string;
+   age: number
+};
+***********************  // Objects can have all sorts of primitive data types within curly braces
+person = {
+   name: 'John',
+   age: 25
+}; // valid
+**********************
+
+Function arguments & return types
+=================================
+The following shows a function annotation with parameter type annotation and return type annotation:
+
+******************************************
+let greeting : (name: string) => string;
+******************************************
+In this example, you can assign any function that accepts a string and returns a string to the greeting variable:
+
+greeting = function (name: string) {
+    return `Hi ${name}`;
+};

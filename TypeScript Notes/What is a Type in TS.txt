@@ -1,0 +1,45 @@
+What is a type in TypeScript
+In TypeScript, a type is a convenient way to refer to the different properties and functions that a value has.
+
+A value is anything that you can assign to a variable e.g., a number, a string, an array, an object, and a function.
+
+See the following value:
+
+'Hello'
+Code language: JavaScript (javascript)
+When you look at this value, you can say that it’s a string. And this value has properties and methods that a string has.
+
+For example, the 'Hello' value has a property called length that returns the number of characters:
+
+ console.log('Hello'.length); // 5
+Code language: JavaScript (javascript)
+It also has many methods like match(), indexOf(), and toLocaleUpperCase(). For example:
+*****************************************************************
+console.log('Hello'.toLocaleUpperCase()); // HELLO
+*****************************************************************
+
+TypeScript inherits the built-in types from JavaScript. TypeScript types is categorized into:
+
+Primitive types
+Object types
+
+The following illustrates the primitive types in TypeScript:
+
+Name	Description
+string	represents text data
+number	represents numeric values
+boolean	has true and false values
+null	has one value: null
+undefined	has one value: undefined. It is a default value of an uninitialized variable
+symbol	represents a unique constant value
+
+----------------------------------------------------------------------
+Object types
+Objec types are functions, arrays, classes, etc.
+
+----------------------------------------------------------------------
+
+Summary
+Every value in TypeScript has a type.
+A type is a label that describes the properties and methods that a value has.
+TypeScript compiler uses types to analyze your code for hunting bugs and erro
