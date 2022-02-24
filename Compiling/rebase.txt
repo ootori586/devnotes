@@ -23,6 +23,7 @@ Procedure
     b. Click "Rebase"
 
  5. Resolve conflicts (if there are any)
+    b. Before you do a force push make sure compile is clean (mvn clean package -Pprod -DskipTests)
 
  6. Do a "force push"
     In Intellij, -> Git -> Push -> Force Push

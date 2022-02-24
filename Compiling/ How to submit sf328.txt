@@ -1,0 +1,27 @@
+
+How to submit an sf328 in the sf328 web application
+---------------------------------------------------
+
+
+Part 1: Use DAS to create a contract
+------------------------------------
+ 1. Enter DAS web app
+    -- Bypass registration by setting the registration_state_id=3 for my_das_user
+
+ 2. In the GCA -> New Contract
+    -- Create a contract 1 in the DAS  (associated with 1 or more cage codes -- e.g. 3bm47, cage1, 6ky98
+    -- Create a contract 2 in the DAS  (associated with 34293)
+
+
+
+
+Part 2: Register in SF328 and Start an Application
+--------------------------------------------------
+ 2. Register in SF328 and enter 6ky98
+
+ 3. Start a new application
+    -- The system knows your cage code (because you registered with it)
+	-- The Start page limits you to those contracts that are related to YOUR cage code
+	-- The Start page will ONLY give you contract 1 as a dropdown option  (not contract 2)
+
+

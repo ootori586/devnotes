@@ -1,0 +1,82 @@
+
+What is one-way binding?
+------------------------
+The HTML is watching the value of a typescript variable
+-- One way
+-- The HTML cannot change the value
+-- The HTML can only READ the value
+-- Use the {{ }} to setup one-way binding
+
+
+
+						     HTML                                  TypeScript class
+				------------------------------------+-----------------------------------------
+                                                    |
+					<p>								|   public username: string = "hi mom!!!";
+						{{ this.username }}			|
+					</p>							|
+													|	public doSomething(): void {
+													|		this.username = 'this is new';
+													|	}
+
+
+
+
+
+
+
+What is two-way binding?
+------------------------
+The HTML and TypeScript communicate with each other
+If you change in HTML, the TypeScript variable will change accordingly
+If you change the TypeScript variable, the HTML wil change accordingly
+
+
+
+						     HTML                                  TypeScript class
+		--------------------------------------------+-----------------------------------------
+                                                    |
+		<input type="text"  						|
+			[(ngModel)]="this.username"/>			|   public username: string = "hi mom!!!";
+													|
+													|
+													|	public doSomething(): void {
+													|		this.username = 'this is new';
+													|	}
+
+
+
+What is keeping the variable and the HTML control in sync?
+ A) Angular framework itself will keep these in sync
+
+
+
+
+Reactive Forms
+--------------
+Another way to work with forms, do form validation
+But, it's not 2-way binding
+-- There is only one myForm object
+
+
+
+						     HTML                                  TypeScript class
+		--------------------------------------------+-----------------------------------------
+        <form  [formGroup]="this.myForm">           |
+			<input type="text"  					|	public myForm: FormGroup;
+				formControlName="username"/>		|
+		</form>										|
+													|	public ngOnInit(): void {
+													|		this.myForm = this.formBuilder.formGroup( {
+													|		 	'username':  [null, null]
+													|		});
+													|	}
+													|
+													|
+													|
+													|		this.myForm.controls.username.setValue('new value for username');
+													|
+													|	let currentUsername = this.myForm.controls.username.value;
+
+
+
