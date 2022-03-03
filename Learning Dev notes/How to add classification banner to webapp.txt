@@ -34,6 +34,14 @@ Design Document
 
 	8. Modify the other pages to adjust their calcs based on the height
 
+	***How to test****
+
+	application.yaml file
+	          or
+	Go to Run - Edit Conf - Spring Boot - backend - VM options - paste after -Dapp.classified_banner.mode=off
+
+
+
 
 
 
