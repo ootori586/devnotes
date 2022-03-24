@@ -1,0 +1,166 @@
+How to use the new Audit Manager
+--------------------------------
+Most SQL insert, update, or deletes need to be audited
+
+
+The Problem
+-----------
+ A. We need add audit records for every insert, update, or delete operation
+
+ B. There are 6 cases:
+        Inserting one record
+		Inserting multiple records
+
+		Updating one record
+		Updating multiple records
+
+		Deleting one record
+		Deleting multiple records
+
+
+
+Approaches
+----------
+ A. Add audit records manually  (sucks)
+ B. Add audit records automatically using the with statement
+
+
+
+
+
+
+
+
+
+
+
+
+The Approach
+------------
+ 1. When you call new AuditManager() it will get a new transactionId
+ 2. When you call auditManager.runSqlInsertOne()
+
+    -- It will wrap your SQL inside a *WITH* statement
+    -- It will get all of the columns for the passed-in audit table
+
+ 3. It's fast
+ 4. It works for inserting one record or 1 million records
+
+
+
+
+
+
+With Statement
+--------------
+
+	Oroginal SQL Insert
+	-------------------
+		INSERT INTO COMMENTS(id, version, ...)
+		values(this, that, other thing, ....)
+
+
+
+	SQL Insert & Add 1 Audit Record
+	-------------------------------
+     with insert_set as (
+			INSERT INTO COMMENTS(id, version, ...)
+			values(this, that, other thing, ....)   RETURNING *
+	 )
+	 insert into comemnts_audid(id, version, ...., timestamp, username, audit_type, transaction_id)
+     (
+		select id, version, ...., timestamp, username, audit_type, transaction_i
+		from insert_set
+     )
+
+
+
+
+
+
+Insert One Record Before    (no audit record is created)
+--------------------------------------------------------
+        // Get the next unique id
+        Integer noteId = databaseService.getNextTableId();
+
+        // Construct the SQL to get these columns of data
+        String sql = "insert into comments (id, version, application_id, question_id, text, created_date, created_userid, updated_date, updated_userid)\n" +
+                     "values (:noteId, 1, :applicationId, :questionid, :commentText, now(), :createdUserId, now(), :createdUserId)";
+
+		// Build the parameter map
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("noteId", noteId);
+        paramMap.put("applicationId", aNewCommentDto.getApplicationId());
+        paramMap.put("questionid", aNewCommentDto.getQuestionId());
+        paramMap.put("commentText", aNewCommentDto.getCommentText());
+        paramMap.put("createdUserId",aLoggedInUserId);
+
+        NamedParameterJdbcTemplate np = new NamedParameterJdbcTemplate(dataSource);
+
+        // Executing SQL to insert the notes record
+        int totalRowsInserted = np.update(sql, paramMap);
+
+        if (totalRowsInserted != 1) {
+            throw new RuntimeException("Error in addComment(). I expected to insert 1 record but I actually inserted " + totalRowsInserted);
+        }
+
+
+
+Insert One Record After    (audit record is created)
+----------------------------------------------------
+   		// Get the next unique id
+        Integer noteId = databaseService.getNextTableId();
+
+        // Construct the SQL to insert a comments record
+        String sql = "insert into comments (id, version, application_id, question_id, text, created_date, created_userid, updated_date, updated_userid)\n" +
+                     "values (:noteId, 1, :applicationId, :questionid, :commentText, now(), :createdUserId, now(), :createdUserId)";
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("noteId", noteId);
+        paramMap.put("applicationId", aNewCommentDto.getApplicationId());
+        paramMap.put("questionid", aNewCommentDto.getQuestionId());
+        paramMap.put("commentText", aNewCommentDto.getCommentText());
+        paramMap.put("createdUserId",aLoggedInUserId);
+
+        // Insert the comments record and add an audit record      (throws an exception if one record is NOT inserted)
+        auditManager.runSqlInsertOne(sql, paramMap, "comments_aud");
+
+
+
+
+
+
+Update N Records Before    (no audit records are created)
+---------------------------------------------------------
+        // Construct the SQL to get these columns of data
+        String sql = "update applications " +
+                     "set state=:newState, assigned_userid=:newEntityManagerId " +
+                     "where id in (:ticketIds)";
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("newState", Constants.ASSIGNED_TO_EM_APPLICATION_STATE);
+        paramMap.put("newEntityManagerId", aReassignApplicationsDTO.getNewEntityManagerId());
+        paramMap.put("ticketIds", aReassignApplicationsDTO.getApplicationIdList());
+
+        NamedParameterJdbcTemplate np = new NamedParameterJdbcTemplate(dataSource);
+
+        int totalRowsUpdated = np.update(sql, paramMap);
+
+
+
+Update N Records After    (N audit records are created)
+---------------------------------------------------------
+        // Construct the SQL to update these application records
+        String sql = "update applications " +
+                     "set state=:newState, assigned_userid=:newEntityManagerId " +
+                     "where id in (:ticketIds)";
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("newState", Constants.ASSIGNED_TO_EM_APPLICATION_STATE);
+        paramMap.put("newEntityManagerId", aReassignApplicationsDTO.getNewEntityManagerId());
+        paramMap.put("ticketIds", aReassignApplicationsDTO.getApplicationIdList());
+
+        // Execute the SQL to update these records  (and add N audit records)
+        int totalRowsUpdated = auditManager.runSqlUpdateMany(sql, paramMap, "applications_aud");
+
+
