@@ -1,0 +1,36 @@
+Making a dialog box
+
+Step 1: You must first make a new component.
+    --ng g c *destination folder*/*nameOfComponent*
+
+Step 2: In the components HTML, this is an example of the code that you would find for
+        a dialog box
+  ---------------------------------------------------------------------------------------
+        <h2>You signed out of NCCS</h2> ***header text***
+
+        <mat-dialog-content>
+          <p>It's a good idea to close all browser windows.</p>
+        </mat-dialog-content>
+
+        <mat-dialog-actions style="justify-content: center">
+
+          <!-- OK Button -->
+          <button mat-raised-button class="standard-button" type="button"  (click)="this.okClicked()" title="Take me to dcsa.mil" aria-label="Take me to dcsa.mil">
+            OK
+          </button>
+
+        </mat-dialog-actions>
+  -----------------------------------------------------------------------------------------------------------
+
+  Step 3: In this case the dialog box has a button to use that goes to an external website.
+          A method needs to be made in the components .ts file to make this button go to
+          that external website.
+
+          example
+  ----------------------------------------------------------
+  public okClicked(): void {
+    //Takes user to this external website
+   window.location.href = 'https://www.dcsa.mil';
+
+   ----------------------------------------------------------
+   notice in the (click) handler of the button class in the mat dialog actions calls on the method "okClicked".

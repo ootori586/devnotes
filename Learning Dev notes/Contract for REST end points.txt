@@ -4,3 +4,75 @@ a. What is the contract for invoking this REST endpoint?
 		3) Data going in   -- e.g., nothing  *OR*  single number *OR* entire object with thousands of fields
 		4) Data coming out -- e.g., status code of 200-299 if it works *AND*
 								    nothing  *OR*  single number  *OR* entire object *OR* list of objects
+
+Making a REST end point
+
+Step 1: In the UserController.java, find the closest already existing REST end point based on
+        if you are using GET, PUT, or POST.
+
+        --Change the URL
+        --Change to a name of the method you are calling it.
+
+        example
+
+        /**
+             * REST endpoint /api/user/logout  <------***URL***
+             */
+            @RequestMapping(value = "***/api/user/logout"***, method = RequestMethod.***PUT***, produces = "application/json")
+            @PreAuthorize("hasAnyRole('***ROLE***', '***ROLE***', '***ROLE***')")
+            public ResponseEntity<?> ***logoutUser()*** {
+
+
+                userService.endSession();
+
+                // Return a response of 200 and the UserInfoDTO object
+                return ResponseEntity.status(HttpStatus.OK).body("");
+            }
+
+  Step 2: In order for the front end to use the REST end point it must subscribe to it (listen for it) using an observable.
+          observables are found in services classes (in this case) the user.service.ts class. You must make a public method
+          that returns an observable that in this case will end a user's session in the backend.
+
+           public ***logout()*** : Observable<string> {
+              const restUrl = environment.baseUrl + ***"/api/user/logout"***;
+              return this.httpClient.***put***<string>(restUrl, "", {responseType:'json'});
+            }
+
+  Step 3: In the component in which the REST end point will be used, you must create a method for the HTML component to reference,
+          to subscribe to services, clear cache, open mat dialogs, disable users from closing dialog boxes, reference css classes etc...
+
+          example
+
+           public userClickedLogout(): void {
+              this.userService.logout().subscribe(()=>{
+                // REST endpoint succeeded
+
+                // We cleared the frontend cache
+                this.userService.clearCache();
+
+                this.matDialog.open(UserIsLoggedOutDialogComponent, {
+                  disableClose: true, // Stop the user from closing the dialog box
+                  backdropClass: "logout-backdrop"
+                });
+
+              })
+            }
+
+   Step 4: The HTML component in which the REST end point is used in this case is a logout button in a mat menu
+
+   example
+
+   <mat-menu #appMenu="matMenu">
+     <button mat-menu-item (click)="userClickedLogout()">Logout</button>
+
+   </mat-menu>
+
+   In the click handler, there is a function being called from Step 3. When this button is clicked all of elements inside
+   that called method will execute.
+
+   ***Important Notes***
+
+   In the userClickedLogout() function there is reference to a backdropClass with the logout-backdrop css method
+   this takes you to styles.css where you create these methods to tweak in this case the background of the logout page.
+
+
