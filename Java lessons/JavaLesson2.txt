@@ -1,0 +1,24 @@
+Today's Exercise
+----------------
+ 1. Create a new object called EditReportDTO
+
+ 2. inside this class, I want a fields
+
+		id      integer
+
+		name    string
+
+		priority integer
+
+
+ 3. I want you to make a new test method
+    -- in AppTest, create another method.  It's got to be public and it can't have any passed-in parameters
+	-- It has to have the @Test annotation above it
+
+
+ 4. Inside this new test method
+	a. Create a copy of your EditReportDTO object
+
+	b. Set some values
+
+	c. Display the values in a logger

@@ -1,0 +1,71 @@
+What the Logout Button Should Do
+--------------------------------
+ 1. Clicking on the name in the header --> opens popup menu  (that shows the logout option)
+
+ 2. Click on "Logout" in the popup menu opens a popup
+    a. Invoke a REST call to end the user's session in the backend
+    b. Clear the cached info on the front-end
+    c. Show this modal dialog box
+		+---------------------------+
+		|  You are logged out
+		|
+        | Please close your browser to copmletely end your session
+        |
+        |          ok
+		+---------------------------+
+
+
+  3. If the user clicks OK, take them to  https://dcsa.mil/
+
+
+
+Design
+------
+ 1. Create a popup menu that has a logout option  (that appears when the user clicks on his/her name)
+
+ 2. Create a dialog box that shows the message w/ok button
+    a. Add click handler for the OK button that takes the user to https://dcsa.mil/
+
+ 3. Create a REST endpoing that ends the user's session
+    PUT    /api/user/logout
+
+	data going in:   Nothing
+	data coming out: Nothing
+
+
+ 4. Create the REST endpoint
+
+    In the nccs backend/src/main/java/com/lessons/service/UserService.java
+
+
+    /**
+     * End the User's Current Session
+     */
+    public void endSession() {
+        String loggedInUsername = this.getLoggedInUserName();
+
+        logger.debug("endSession() started for {}", loggedInUsername);
+
+        // Get the UserInfo object from Spring Security
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        if (securityContext == null) {
+            throw new RuntimeException("Error in endSession():  SecurityContext is null.  This should never happen.");
+        }
+
+        // Clear the user's authentication
+        securityContext.setAuthentication(null);
+
+        logger.debug("endSession() finished for {}", loggedInUsername);
+    }
+
+
+    Have our UserController REST endpoint method call it
+
+
+
+ 5. Create a click handler for this logout option
+    a. Invoke a REST call to end the user's session in the backend
+    b. Clear the cached info on the front-end
+    c. Show this modal dialog box
+
+

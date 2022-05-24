@@ -4,6 +4,7 @@ a. What is the contract for invoking this REST endpoint?
 		3) Data going in   -- e.g., nothing  *OR*  single number *OR* entire object with thousands of fields
 		4) Data coming out -- e.g., status code of 200-299 if it works *AND*
 								    nothing  *OR*  single number  *OR* entire object *OR* list of objects
+	    5) Security        --e.g., assign user roles that controls who has access to the REST end Point
 
 Making a REST end point
 

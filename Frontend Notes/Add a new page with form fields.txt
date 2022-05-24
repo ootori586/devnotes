@@ -1,0 +1,153 @@
+Lesson 1:  Add a new page to DAS with some form fields
+------------------------------------------------------
+ 1. Add a new page to DAS
+	a. Create the component
+       ng generate component lessons/reports/addReport --skipTests
+       *OR*
+       ng g c lessons/reports/addReport --skipTests
+
+    a. Add a constant for the route  (in constants.ts)
+        LESSON_ADD_REPORT_ROUTE = "page/lesson/reports/add",
+
+
+	b. Add the route  (in app.module.ts)
+
+
+	c. Add the navbar item  (in navbar.component.html)
+       -- Create a link called "Add Report" that takes us to this route
+
+	d. Add security records to the database so that the DAS_ADMIN can see & view this page
+
+       1) Insert a new uicontrols record with this route
+			insert into uicontrols(id, name) values(3000, 'page/lesson/reports/add');
+
+       2) Grant the record to the DAS_ADMIN role
+			insert into roles_uicontrols(role_id, uicontrol_id) values (1, 3000);    -- grant the DAS_ADMIN role access to this page
+
+
+
+ 2. Destroy & re-create your database
+
+
+ 3. Verify that you can reach the new page
+    a. Activate the debugger on DAS Full Web App
+
+    b. Register an account / set role to EMTL
+	   Go to http://localhost:4200
+
+    c. Approve the account
+       Go to http://localhost:4200/page/admin/manage/users/2
+       Click on DAS (Pending)
+       Approve the Account
+
+    d. Verify that you can see the navbar item
+       1) Go to http://localhost:4200
+       2) Refresh the browser
+       3) On the left, Click on the navbar item for "Add Report"
+
+	e. Verify that you can see "Add Report Works!"
+
+
+
+ 4. Setup Page Layout
+	a. Setup a layout for the page
+
+	   1) Use angular flex to setup the page layout
+
+
+			+----------------------+----------------------------+
+			| Add Report           |       <empty for now>      |           row1   has a 50/50 split left and right
+            +---------------------------------------------------+
+			|  mat-card                                         |           row2
+			|                                                   |
+			|                                                   |
+			+---------------------------------------------------+
+
+
+
+ 5. Add a mat-card to row2 and fill it in
+    a. Edit the html page
+
+    b. In the 2nd row, add a <mat-card>
+        -- do not add a card title
+
+
+    c. In the css file, let's give all mat-cards some depth  (by adding margin)
+
+	   mat-card{
+		  margin-right: 10px !important;
+  		 margin-left: 5px !important;
+		}
+
+
+ 	d. In the <mat-card>, let's add a <mat-card-content> tag
+
+	e. In the <mat-card-content> tag, add a few labels   (these are place holders)
+
+
+		<div>
+		textbox1:  Report Name
+		</div>
+
+		<div>
+		textbox2:  Description
+		</div>
+
+
+
+
+
+ 6. Setup a reactive form in your typescript
+	a. Edit your typescript class
+
+	b. Add the public myForm object    (it's type is FormGroup)
+
+	c. Inject the formBuilder into the constructor
+
+	d. In the ngOnInit(), let's initialize the myForm object
+		1) The "Report Name" control will be called reportName
+		2) The "Description" control will be called reportDescription
+
+
+
+ 7. Add the real form fields to your html
+  	a. Edit your html page
+
+	b. Replace the text1: Report Name with a real text box
+
+		<mat-form-field>
+				<mat-label>Report Name</mat-label>
+
+				 <input type="text" matInput aria-label="Report Name"
+                                   title="Report Name"
+                                   formControlName="reportName"/>
+		</mat-form-field>
+
+
+   c. Replace textbox2: Description with a real text box
+
+		<mat-form-field>
+				<mat-label>Report Description</mat-label>
+
+				 <input type="text" matInput aria-label="Report Description"
+                                   title="Report Description"
+                                   formControlName="reportDescription"/>
+		</mat-form-field>
+
+
+
+ 8. Add a "Reset" button
+
+		<button type="button" mat-raised-button >
+			Reset
+		</button>
+
+
+ 9. Add a "Save" button
+
+		<button type="button" mat-raised-button color="primary">
+			Save
+		</button>
+
+
+10. Activate the debugger and take a look

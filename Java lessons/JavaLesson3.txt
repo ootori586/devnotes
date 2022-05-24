@@ -1,0 +1,161 @@
+Notes on Lists and Maps
+-----------------------
+
+
+Collection:  Is a group of stuff
+
+
+
+ List
+ ----
+  Ordered collection
+  Homogeneous -- list of strings or it's a list of boolean or it's a list of ONE THING
+
+   List<String> myListOfStrings;      // This is a list of string objects
+
+   List<Integer> myListOfIntegers;    // list of Integer objects
+
+   List<DTO>  myListOfDTOs;           // List of DTO objects
+
+
+
+
+     List<String> myListOfStrings = new List();      // BAD!!!
+
+      List<String> myListOfStrings = new ArrayList<>();   // allocates space for a list of strings
+      myListOfStrings.add("string 1");
+      myListOfStrings.add("string 2");
+      myListOfStrings.add("string 3");
+
+
+
+
+
+ Map
+ ---
+
+
+
+
+
+
+
+
+
+   List vs ArrayList
+   -----------------
+
+	What is a List?   Interface:
+
+		public int size()
+
+		public void add(Object o)
+
+
+	You *CANNOT* all new on a List
+	-- List is an interface or contract
+
+
+
+
+		ArrayList is a concrete class that implements the List
+			You can call *NEW* with the ArrayList
+
+		LinkedArrayList
+
+
+
+			+---------------------------------------------
+			|     |      |       |        |      |       |
+			----------------------------------------------
+              0      1       2      3        4       5
+
+
+
+			String firstElement = myList.get(0);     // Get the 1st element
+
+
+
+
+			Linked List
+            + Fast deletes (in the middle)
+            + Fast inserts (in the middle)
+
+				----- 			-----		-----		-----		-----		-----
+				| A |  --->  	| B |  -->  | C |  -->  | D |  -->  | E |  -->  | F |
+				-----           -----       -----       -----       -----       ----
+
+
+				----- 			-----		  -----		  -----		-----
+				| A |  --->  	| B |  -->    | D |  -->  | E |  -->  | F |
+				-----           -----         -----       -----       ----
+
+
+			LinkedArrayList<String> myList2 = new LinkedArrayList<>();      // Still a list but it's using a linked-list under the hood
+
+				myList2.add("test1");
+
+
+
+			ArrayList<String> myList1 = new ArrayList<>();      // Still a list but it's using an ARRAY  under the hood
+
+				myList1.add("test1");
+
+
+
+
+
+		Map has keys / values
+		+ Value can be anything (so it can be a DTO or a Boolean or  List<String>  (
+		+ Get calls are crazy fast!!!   (I don't have to loop through everything in the list to get it)
+
+		- Does not maintain the order
+
+
+				+-------------------------
+				|   key     |   value    |
+				+-----------+------------+
+				| <string>  |   object   |
+
+
+
+				+----------------------------
+				|   key     |   value       |
+				+-----------+---------------+
+		2500	| "abc"     |   "stuff"     |
+		2501	| "adefbc"  |   True        |
+		2502	| "info"    |   dto object  |
+		2503	| "more"    |  List<String> |
+				+-----------+---------------+
+
+  		Each key is unique
+
+			Map<String, Object> paramMap = new HashMap<>();
+			paramMap.put("abc", "stuff");                       // 1st time, **INSERTS** the key/value into the map
+
+			paramMap.put("abc", "stuff 252");					// 2nd time, it overwrites the value in the map
+
+			paramMap.put("abc", "stuff 253");
+
+			paramMap.put("abc", "stuff 254");
+
+
+
+			String s = paramMap.get("abc");       // Pull the value out
+
+
+			String s2 = paramMap.get("more");       // Pull the value out
+
+
+
+			Map<String, Object> paramMap = new HashMap<>();
+
+
+
+		String is a type of Object
+		Integer is a type of Object
+		DTO is a type of Object
+
+		int is a primitive
+
+

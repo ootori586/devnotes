@@ -1,0 +1,97 @@
+What do you need to implement a REST endpoint?  What makes up the contract?
+
+	What do you need to invoke a REST endpoint?
+	1) URL:   /api/this/that
+
+	2) URL Type:   GET / POST / PUT / DELETE
+
+	3) Data going in
+			GET /api/applications/stuff/25
+
+			POST /api/applicaiton/stuff
+			{
+				'id': 25,
+				'name': 'hi mom'
+			}
+
+
+	4) Data going out
+		-- Could be a single number, string, boolean
+		-- could be an object
+
+			Object --> gets converted to JSON
+
+
+			{
+				'id': 25,
+				'name': 'hi mom'
+			}
+
+
+
+	5) Security
+		-- Do you have the role needed to access this REST call
+
+	Today's Exercise
+	----------------
+    Create REST endpoint
+
+		a. POST /api/reports/add
+
+		b. Pass-in a JSON map that has 3 fields
+
+			{
+		           “name”:  “report 2.txt”,        // required
+		           “is_active”: true,              // required
+		   		   “report_source”: 5              // optional
+			}
+
+
+		c. Nothing is returned
+
+		d. Security:  DAS_ADMIN or DAS_SUPERUSER are allowed
+
+	    e. What is this REST endpoint actually doing?
+
+
+
+
+	Plan for building the REST endpoint
+	-----------------------------------
+	1. You need to create a DTO:    AddReportDTO
+			-- It has the 3 fields in it
+			-- It has the getters & setters
+
+
+    2. Add a method to the ReportService:       ReportService.add()
+			-- call it add()
+			-- It takess-in the AddReportDTO
+			-- Use the logger to log a message
+
+
+	3. Add the method to your ReportController:    ReportController.add()
+       a. Add a public method
+
+	   b. You need to tell Spring-web that your REST endpoint is taking-in a object
+
+			@RequestBody AddReportDTO  aAddReportDTO
+
+
+	   c. You need to make sure that the required fields are there
+
+			If the required fields are no there, then we return a 400 error code
+
+
+			if (the required fields are missing) {
+
+	   			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+		                .contentType(MediaType.TEXT_PLAIN)
+		                .body("You didn't provide all of the required fields.  You suck!!!");
+
+			}
+
+
+
+	    d. If it passes all of your checks, then call reportService.add( )   and pass-in the DTO
+
+

@@ -19,4 +19,8 @@ This will build both web apps (nccs web app and admin web app)
 
  4) connect to the admin webapp by going to http://localhost:8081/nccs-admin
 
+ 5)  mvn clean package -Pprod -PbuildRda Build the RDA
+
+
+
 

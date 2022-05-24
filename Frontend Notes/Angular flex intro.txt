@@ -1,0 +1,70 @@
+
+
+Into to Angular Flex Layout
+---------------------------
+
+		+---------------+
+		|    item 1     |
+		+---------------+
+	    |    item 2     |
+		+---------------+
+
+		<div fxLayout="column">
+			<div>
+				Item 1
+			</div>
+
+			<div>
+				Item 2
+			</div>
+		</div>
+
+
+
+
+		+---------------+----------------+
+		|    item 3     |    item 4      |
+		+---------------+----------------+
+
+
+		<div fxLayout="row">
+			<div>
+				Item 3
+			</div>
+
+			<div>
+				Item 4
+			</div>
+		</div>
+
+
+
+		+--------------------+
+		|  Left   |  Right   |
+		+--------------------+
+	    |  item 4            |
+		+--------------------+
+
+
+
+		<div fxLayout="column">
+			<div>
+
+				<div fxLayout="row">
+					<div fxFlex="50%">
+						<!-- left Side of the 1st row -->
+						Left
+					</div>
+
+					<div fxFlex="50%">
+						<!-- Right side of the 1st row -->
+						RIght
+					</div>
+				</div>
+
+			</div>
+
+			<div>
+				Item 4
+			</div>
+		</div>
