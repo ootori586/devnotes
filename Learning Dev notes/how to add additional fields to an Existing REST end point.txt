@@ -1,0 +1,89 @@
+How to add additional fields to an *EXISTING* rest end point
+------------------------------------------------------------
+Problem:  We need to show the 4 organizations in that page
+
+
+ 1. The page has an observable (that invokes a REST endpoint to get info about a user)
+
+ 2. The async pipe invokes the REST
+
+ 3. The REST end point comes in, then we can show that info
+
+
+
+	Order of Operations
+	-------------------
+	1. Admin user goes to the DAS Manage Users page
+	2. Admin user clicks to "Verify" user
+		-- Router takes us to the Verification Page
+
+	3. The Verification page starts-up
+
+	       public userInfoObs: Observable<GetInfoForVerificationUserDTO>;
+
+
+
+		a. constructor() called in your ts class
+	       (Angular injects the services here)
+
+
+		b. ngOnInit() called
+			-- Gets the userid from the url
+					/page/verifiy/user/265
+
+			-- We initialize observables here
+			        this.userInfoObs = this.userService.getInfoForVerificationUser(this.userId);
+
+
+
+		c. HTML is rendered
+
+			1)  <ng-container *ngIf="(this.userInfoObs | async) as userInfo">
+					-- Everything is invisible at this point
+				</ng-container>
+
+
+			2) The async pipe INVOKES your REST endpoint
+					/api/user/verification/info/
+
+			   **WAIT  n milliseconds**
+
+			3) REST endpoint comes back successfully  (status code is 200-299)
+			   It comes back with an object
+
+			4) The inside of the ng-container **APPEARS** and userInfo holds the returned data
+				-- We render the remaining parts of the page
+
+					The user's email is {{userInfo.email}}
+
+
+
+	Changes
+	-------
+	1. Change the front-end to show the additional fields
+	    a. Change the front-end DTO by adding the additional fields -- e.g., GetInfoForVerificationUserDTO.ts
+			-- Add the additional public variables
+
+		b. Use the additional fields in the HTML and display stuff
+
+
+
+	2. Change the back-end REST call to return the additional fields
+		a. Change the back-end DTO to hold the 4 fields -- e.g., GetInfoForVerificationUserDTO.java
+			1) Add the private variables
+	        2) Add the getters & setters
+
+
+		b. Change the REST call to fill-in these additional fields
+		    1) Find the REST endpoint
+			   Search the backend for this:   /api/user/verification/info/
+
+            2) Find the java service that is used
+
+			3) Change the java service to fill-in my additional fields
+				-- Change the SQL to get the additional fields
+
+
+
+
+
