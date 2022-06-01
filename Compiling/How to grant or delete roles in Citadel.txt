@@ -18,3 +18,7 @@
     5. Grant a role
        unix> export USERNAME=my-user-name
        unix> citadel attribute:add -u $USERNAME -a ROLE:ROLE_TO_BE_ADDED
+
+
+
+
