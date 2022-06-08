@@ -1,0 +1,328 @@
+Exercise:  Add a date and text box side-by-side
+-----------------------------------------------
+
+If you want to see screens shots with this lesson:
+   Go to https://docs.google.com/document/d/1R7ODgft6i2mOqFl0JMLum1ckEs94RbCMgJ0wU7j2QY0/edit?usp=sharing
+   Go to Page 13
+
+
+
+Problem 1:  I want a start date (using mat-datepicker) and textbox next to each other
+problem 2:  The Date Picker is not the same height
+
+	+--------------------+-----------------+
+	|   start date       |   textbox       |
+	+--------------------+------------------
+
+
+When finished, you should have this layout
+
+	+--------------------+-----------------+
+	|   Report Name                        |
+	+--------------------+------------------
+	|   Priority                           |
+	+--------------------+------------------
+	|   start date       |   textbox       |           <---  New row with 2/form fields that we're going to add
+	+--------------------+------------------
+	|   Reset Btn        |    Save Btn     |
+	+--------------------+------------------
+
+
+
+
+
+
+
+
+
+
+
+Procedure
+---------
+ 1. Add a row where the start date and textbox will be added
+    Setup the layout with 2 side-by-side rows
+
+	 <div fxLayout="row">
+
+			<div>
+				<!-- Start Date -->
+				Start Date
+			</div>
+
+			<div>
+				<!-- Extra Days Text Box -->
+				Textbox
+			</div>
+	 </div>
+
+
+
+ 2. Add 2 fields to the form:  rptStartDate and rptExtraDays
+    a. Edit the typescript class
+
+    b. Add rptExtraDays and rptStartStart to the form
+
+		   public ngOnInit(): void {
+
+			// Initialize the form
+			this.myForm = this.formBuilder.group({
+				rptName:        [null, null],
+				rptDescription: [null, null],
+				rptPriority:    [null, null],
+				rptStartDate:   [null, null],
+				rptExtraDays:   [null, null]
+			});
+
+
+ 3. Add the textbox
+
+
+	 <div fxLayout="row">
+
+			<div>
+				<!-- Start Date -->
+				Start Date
+			</div>
+
+			<div>
+				<!-- Extra Days Text Box -->
+                <mat-form-field>
+                  <mat-label>Extra Days</mat-label>
+                  <input matInput maxlength="3" formControlName="rptExtraDays"  aria-label="Report Extra Days">
+                </mat-form-field>
+			</div>
+	 </div>
+
+
+
+
+ 4. Add the angular material date picker for the start date
+
+      <div fxLayout="row">
+
+        <div>
+          <!-- Start Date -->
+          <mat-form-field>
+            <mat-label>Start Date</mat-label>
+
+              <input matInput formControlName="rptStartDate"
+                     aria-label="Report Start Date"
+                     [matDatepicker]="startDatePicker">
+              <mat-datepicker-toggle [for]="startDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #startDatePicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <!-- Extra Days Text Box -->
+          <mat-form-field>
+            <mat-label>Extra Days</mat-label>
+            <input matInput maxlength="3" formControlName="rptExtraDays" aria-label="Report Extra Days">
+          </mat-form-field>
+        </div>
+
+      </div>
+
+	Problem:  It looks like shit!!!
+              Start Date is very tall
+			  There is no space between the controls
+
+
+
+ 5. Add a layout gap so there is space between the controls
+
+	Change
+		<div fxLayout="row">
+
+	To this:
+		<div fxLayout="row" fxLayoutGap="20px">
+
+
+
+
+ 6. Reduce the height of the Date Picker (so it's not so !#$#$@# tall)
+    a. Add a div class around the the <input and mat-date-picker-toggle and mat-datepicker>
+
+	   Change this:
+              <input matInput formControlName="rptStartDate"
+                     aria-label="Report Start Date"
+                     [matDatepicker]="startDatePicker">
+              <mat-datepicker-toggle [for]="startDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #startDatePicker></mat-datepicker>
+
+
+	   To this:
+              <div class="date_container">
+                  <input matInput formControlName="rptStartDate"
+                         aria-label="Report Start Date"
+                         [matDatepicker]="startDatePicker">
+                  <mat-datepicker-toggle [for]="startDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #startDatePicker></mat-datepicker>
+              </div>
+
+
+   b. Add the .date_container css class to the css file
+
+		.date_container {
+		  float: left;
+		  display: flex;
+		  align-items: center;
+		}
+
+
+
+   Problem:  The Date Toggle looks better but it's still too fucking tall
+
+
+
+ 7. Reduce the height of the date picker controls so they are all on *ONE LINE*
+
+    a. Change the .date_container CSS class to this:
+
+		.date_container {
+		  float: left;
+		  display: flex;
+		  align-items: center;
+
+		  /* Reduce the date picker's height */
+		  margin-bottom: -.75em;
+		  margin-top: -1.25em;
+		}
+
+
+
+    Problem:  If you click on a date, the selected date value CONFLICTS with the mat-label
+              -- So, the selected date looks like shit!
+
+
+
+ 8. Remove the date picker's mat-label and use the place holder
+    a. Remove the <mat-label>Start Date</mat-label>
+
+    b. Add a placeholder="Start Date" to the date picker's input box (so it looks like this)
+
+          <input matInput formControlName="rptStartDate" place
+                 aria-label="Report Start Date" placeholder="Start Date"
+                 [matDatepicker]="startDatePicker">
+
+
+
+	 Now, no date is selected, then user sees the "Start Date" label
+           a date is selected, then user sees the date  (and no label)
+
+
+
+
+
+Unlike textboxes, date picker's have issues:
+ A) How to reformat the date into a format that we want:  	Take Date object      --> selectedFormattedDAte
+ B) How to pre-load the date picker with a date				selectedFormattedDate --> Displayed in Date Picker
+
+
+
+
+
+
+Part 2:  How to get the selected date and format it to a string
+---------------------------------------------------------------
+ 1. Add a new public variable:
+      public selectedFormattedDateString: string;
+
+
+ 2. Add this tag so we can see the value
+     <pre>
+		 selectedFormattedDateString={{this.selectedFormattedDateString}}
+     </pre>
+
+
+ 3. When the user presses "Save", we will take the date object and format it to a date string
+    a. Add a (click) handler to the save button
+
+		  public saveClicked(): void {
+			console.log('saveClicked()');
+		  }
+
+
+	b. Change the Save button to invoke it on click
+
+          <!-- Save Button -->
+          <button type="button" mat-raised-button color="primary" (click)="this.saveClicked()">
+            Save
+          </button>
+
+
+
+ 4. Change the save click handler to get the date and format it to a string
+    a. Inject the locale object into the constructor
+
+			 @Inject(LOCALE_ID) private locale: string
+
+
+	b. Change the saveClicked() method to this:
+
+		  public saveClicked(): void {
+			console.log('saveClicked()');
+
+			this.selectedFormattedDateString = "";
+			if (this.myForm.controls.rptStartDate.value) {
+			  // User selected a date.  So, get the date formatted as a string
+
+			  // Convert the Date object into a formatted date (as a string)
+			  this.selectedFormattedDateString = formatDate(this.myForm.controls.rptStartDate.value,'yyyy-MM-dd', this.locale);
+			}
+		  }
+
+
+     Now, we have taken the Date object and converted it a simple string with the formatted date
+
+
+
+
+
+Part 3:  How to load the selected date from a date string like -- e.g., "2020-05-01"
+------------------------------------------------------------------------------------
+Problem:  We have a string that contains our formatted date.  Now, we need to set it in the Date Picker
+
+ 1. Add a public date object (which will be used to pre-populate the date picker)
+	  public initialStartDate: Date;
+
+
+ 2. Change the date picker to start with this date by adding [startAt]="this.initialStartDate" to the date picker
+        <mat-datepicker [startAt]="this.initialStartDate"  #startDatePicker></mat-datepicker>
+
+
+ 3. Create a method called loadDateClicked
+
+	  public loadDateClicked(): void {
+
+	  }
+
+
+
+ 4. Add a button after "save"
+
+      <!-- Load Date -->
+      <button type="button" mat-raised-button color="primary" (click)="this.loadDateClicked()">
+        Load Date
+      </button>
+
+
+
+ 5. Change the loadDateClicked so it takes a string, converts it to a Date object (without timezone) and set it in the date picker
+
+	  public loadDateClicked(): void {
+		let previousDate: string = "2020-05-01";
+
+		if (previousDate ) {
+		  // create a date object without a timezone
+		  // step 1: get the date as an ISO date representation date string
+		  // step 2: strip off the Z character from the end of the ISO string
+		  // step 3: pass in the result to the date constructor
+		  let tempDate: Date = new Date(previousDate);
+		  this.initialStartDate = new Date(tempDate.toISOString().slice(0,-1));
+		  this.myForm.controls.rptStartDate.setValue( this.initialStartDate );
+		}
+	  }
+
+
+Now, we can load the date field with a date and we can get the selected date

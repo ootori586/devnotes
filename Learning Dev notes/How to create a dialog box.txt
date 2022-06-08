@@ -34,3 +34,60 @@ Step 2: In the components HTML, this is an example of the code that you would fi
 
    ----------------------------------------------------------
    notice in the (click) handler of the button class in the mat dialog actions calls on the method "okClicked".
+
+   Techniques Used on the Dialog Box
+   ---------------------------------
+    1. Disable the auto-close (but after the user passes form validation)
+       -- So the user can still click outside of the dialog box to close it  (or press Esc)
+       this.matDialogRef.disableClose = true;
+
+    2. How to inject the router
+   		constructor(
+   			private router: Router
+   		) {}
+
+
+    3. When the REST call comes back successfully, we use the router to take the user to a different page
+       //Take the user to the List All page
+         this.router.navigate([Constants.LIST_APPLICATIONS_ROUTE]).then();
+
+
+    4. The .add() was used to close the dialog box  [whether the REST call works or fails]
+
+      }).add(() => {
+         //REST call finally block
+         // Close dialog box
+         this.matDialogRef.close(true);
+         })
+
+    5. Added the standard-button CSS class in the css
+       .standard-button {
+   		width: 100px
+   	}
+
+
+    6. We used the standard-button CSS class
+           class="standard-button"
+
+   	-- Both buttons have the *SAME* width which looks good
+
+
+
+    7. We disabled the buttons while the submit was in progress
+         [disabled]="this.submitInProgress == true"
+
+
+
+    8. How to set the dialog box width
+
+   	matDialogRef.open(DialogClassName, {
+   				width: 400px
+   		});
+
+
+    9. We simulated a SLOW rest call
+   	  in our fake service
+
+   			return of("").pipe(delay(3000));
+
+
