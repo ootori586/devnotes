@@ -1,0 +1,12 @@
+1. Find the method in the Service associated with the data that is being passed into the ag grid.
+
+2. You will be a String of sql that gets the order.
+
+    "order by con.created_date desc";
+
+    --In this case, we want contract tags to display in descending order.
+    con.created_date is the contract creation date table and desc is descending.
+
+    NOTE****
+
+    --ASC is ascending order
