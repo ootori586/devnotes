@@ -1,0 +1,19 @@
+1. When using constants in SQL Strings you must "break" them out of the statement using quotes and concatenation signs.
+
+example *** need to replace 21 wth a constant***
+
+  case\n" +
+                "           when app.state <> 21 then 'Yes'\n" +
+                "           else 'No'\n" +
+
+  1. Find the associated CONSTANT name for the integer 21. In this case it's USER_STARTED_FILLING_IN_APPLICATION_STATE
+
+  2. Add the Constants class . Constant you want.
+
+  3. "close off" the statement before and after the constant you are adding by adding quotes.
+
+  4. Then add a concatenation sign "+" before and after the Constant statement. Make sure to add a space between the statement and concatenation signs.
+
+  case\n" +
+                    "           when app.state <>" + Constants.USER_STARTED_FILLING_IN_APPLICATION_STATE + " then 'Yes'\n" +
+                    "           else 'No'\n" +
