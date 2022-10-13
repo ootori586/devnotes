@@ -1,0 +1,293 @@
+Backend Lesson / Spring
+-----------------------
+
+What is Spring?
+---------------
+Spring is a colleciton of libraries -- is really spring-core, spring-jdbc, spring-web, spring-security  (open source java libraries)
+
+"Microsoft Office" is really, Word, Excel, PowerPoint, Publisher, Outlook, Access  (pay for)
+
+
+Advantages of Spring-Jdbc
+-------------------------
+
+
+
+Advantages of Spring
+--------------------
+ 1. Dependency Injection lets you share code more easily
+
+		@Resource
+		private DataSource dataSource;
+
+
+    Resources for pulling-in services
+    Got your controllers and services and you can easily instantiate and use them
+    -- you're in the box!!
+
+
+ 2. Resources are built at run time
+    Spring Life Cycle
+
+	a. main() called
+
+	b. main() tells spring to startup
+
+		1) Looks for all classes that have @Controller, @Service, @Bean, @ControllerAdvice, @Value
+
+		2) For each of these class
+
+			a. Calls new on the class -->  Your plain old constructor is called
+
+			b. It injects any dependencies
+
+			c. Calls the postContructor
+
+
+
+ 3. More efficient use of resources
+    -- It only builds the resources that it needs to
+
+
+
+
+	public static void main() {
+
+
+
+
+		DataSource dataSource = new DataSource();
+
+		MyService myService = new MyService(dataSource);
+		myService.runThis();
+
+
+		MyController myController = new MyController(myService);
+
+	}
+
+
+
+
+	Standard REST Call
+	------------------
+		@Controller
+		MyController class
+			--> Depends on the MyService
+
+			@Service
+			MyService class
+				--> Depends on the DataSource  (needs this to run some SQL)
+
+				@Bean
+				DataSource
+
+					--> Depends on @Value annotations that inject properties -- e.g., database name, user, password, the number of connecitons in the pool
+
+
+
+		Spring App is a tree of objects  (in the box)
+
+					LookupController                 ServerSideGridController
+
+					LookupService					ServerSideGridService
+
+					DataSource						  ElasticSearchResources
+
+
+
+
+
+					AdamResnicksSuperService
+					--> UserService
+					--> LookupService
+
+
+
+			@Resource
+			private AdamResnickSuperService superService;
+
+
+
+	Exercise
+	--------
+
+	1. Get a new branch
+
+	2. Add a new service called TimeService
+
+		a. Add a logger
+
+		b. Add a constructor
+			-- Add a logger call to this
+
+		c. Add another public method called init() that returns nothing
+			-- Add the @PostContruct annotation
+			-- Add a logger call to this method
+
+
+		d. Inject the DataSource
+
+		e. Add a public method called getCurrentDateTime() that returns a string
+
+		f. Run some sql:  select now();
+
+		g. Returns the date/time
+
+
+
+	3. Add a new controller called TimeController
+
+		a. Add a logger
+
+
+		b. Add a constructor
+			-- Add a logger call to this
+
+		c. Add another public method called init() that returns nothing
+			-- Add the @PostContruct annotation
+			-- Add a logger call to this method
+
+
+		d. Add a REST call to get the current date/time from the database
+
+		e. inject the TimeService
+
+		f. REST call will return the current date/time
+
+
+
+	4. Use Postman to hit it
+		-- Verify that you see the current date/time
+
+
+
+
+
+	Contract for REST call:
+		GET   /api/time
+		Nothing is passed-in
+		String is returned  (not JSON)
+
+
+
+
+	SomeDTO dto = new SomeDto();
+
+	Contructor is simple:
+
+	public class SomeDto {
+
+		/*
+         * My Sample Constructor
+ 		 *
+		public SomeDto() {
+			logger.debug("constructor called");
+		}
+
+
+
+
+	}
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------
+***********Service**********************
+
+package gov.dcsa.services;
+
+import gov.dcsa.controllers.UserController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+
+
+@Service
+public class TimeService {
+    private static final Logger logger = LoggerFactory.getLogger(TimeService.class);
+
+    @Resource
+    private DataSource dataSource;
+
+
+    public TimeService() {
+        logger.debug("Constructor started");
+    }
+
+    @PostConstruct
+    public void init(){
+        logger.debug("init started");
+
+    }
+
+    public String getCurrentDateTime(){
+
+        String sql = "select now()";
+
+        JdbcTemplate jt = new JdbcTemplate(this.dataSource);
+
+        String currentDate = jt.queryForObject(sql, String.class);
+
+        return currentDate;
+
+    }
+
+}
+
+----------------------------------------------------------------------------------------------------------------------
+************Controller*****************
+package gov.dcsa.controllers;
+
+
+import gov.dcsa.services.TimeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+@Controller
+public class TimeController {
+    private static final Logger logger = LoggerFactory.getLogger(TimeController.class);
+
+    @Resource
+    private TimeService timeService;
+
+    public TimeController(){
+        logger.debug("TimeController started");
+    }
+
+    @PostConstruct
+    public void init(){
+        logger.debug("init has started");
+    }
+
+    /**
+     * GET /api/ack/get
+     */
+    @RequestMapping(value = "/api/time", method = RequestMethod.GET, produces = "text/plain")
+    public ResponseEntity<?> getCurrentTime() {
+
+        String currentTime = timeService.getCurrentDateTime();
+
+        logger.debug("getCurrentTime stared");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(currentTime);
+    }
+
+}

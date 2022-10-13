@@ -62,3 +62,115 @@ In this example, you can assign any function that accepts a string and returns a
 greeting = function (name: string) {
     return `Hi ${name}`;
 };
+
+ngOnInIt method typescript examples
+    let obj1: ReportDto = new ReportDto(); //using the "new" syntax (java familiar)
+
+    obj1.id= 10;
+    obj1.displayName= "Rpt 1";
+
+    let obj2: ReportDto = new ReportDto();
+
+    obj2.id= 20;
+    obj2.displayName= "Rpt 2";
+
+    let obj3: ReportDto =
+    {
+      id: 30,
+      displayName:"Rpt 3",
+      isFinished: true
+    }
+
+    let example: ReportDto[] = [];   //This is a way to create an array of objects using the push method
+
+    example.push(obj1);
+    example.push(obj2);
+    example.push(obj3);
+
+    let newExample: ReportDto[] = [obj1, obj2, obj3]; // This is a short version of creating an array of objects
+
+    let lastArray: ReportDto[]= [ //This is the curly brace syntax
+      {
+        id: 10,
+        displayName: "Rpt 1",
+        isFinished: false
+      },{
+      id: 20,
+      displayName: "Rpt 2",
+      isFinished: false
+      },{
+      id:30,
+      displayName: "Rpt 3",
+      isFinished: true
+      }
+    ];
+
+    Front end service******************************************************************************************************************
+    import { Injectable } from '@angular/core';
+    import {Observable, of} from "rxjs";
+    import {IndicatorDto} from "../models/indicator-dto";
+
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class MyGridService {
+
+      public getAllIndicator(): Observable<IndicatorDto[]>{
+        let obj1: IndicatorDto = new IndicatorDto();
+
+        obj1.id= 10;
+        obj1.name= "Melanie";
+        obj1.type= 1;
+
+        let obj2: IndicatorDto = new IndicatorDto();
+
+        obj2.id= 2;
+        obj2.name= "Adam";
+        obj2.type= 2;
+
+        let obj3: IndicatorDto = new IndicatorDto();
+
+        obj3.id= 3;
+        obj3.name= "David";
+        obj3.type=3;
+
+        let newArray: IndicatorDto[] = [obj1, obj2, obj3]
+
+        return of(newArray)
+
+      }
+
+      public getAllIndicatorsTwo(): Observable<IndicatorDto[]>{
+
+        let objects: IndicatorDto[] =[{
+          id: 10,
+          name: "Melanie",
+          type: 1
+        }, {
+          id: 20,
+          name: "Adam",
+          type: 2
+        },{
+          id:30,
+          name: "David",
+          type: 3
+        }];
+
+        return of(objects);
+
+      }
+
+      constructor() { }
+    }
+
+
+Front end DTO*******************************************************************************
+
+export class IndicatorDto {
+
+  public id: number;
+
+  public name: string;
+
+  public type: number;
+}

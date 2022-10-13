@@ -1,0 +1,254 @@
+Lesson 6:  REST Endpoint for a client side grid w/filter-number
+---------------------------------------------------------------
+
+
+
+What is the contract?
+---------------------
+	1) URL:   /api/reports/history/list/{applicationId}/{filterNumber}
+
+	2) URL Type:   GET
+
+	3) Data going in:
+			the application Id   (on the URL)
+			the filter number    (on the URL)
+
+			if the filter number == 1, then get everything with action_date that is less than 1 DAY old
+			if the filter number == 2, then get everything with action_date that is less than 7 DAYS old
+			if the filter number == 3, then get everything with action_date that is less than 30 DAYS old
+			if the filter number == 4, then get everything with action_date that is less than 365 DAYS old
+			if the filter number == 5, then get everything with action_date that is year-to-date  (created after january 1st of the current year)
+
+
+	4) Data going out
+			List of objects
+			[
+				{
+					old_state_name:    "User Started Filling-in",
+					new_state_name:    "Entity Mgr Review",
+					author_full_name:  "John Smith",
+					assigned_user:     "John Smith",
+                    action_date:       "08/25/2022 13:53:44"
+				}
+			]
+
+
+	5) Security
+		-- FRMS_USER, FRMS_SUPERUSER
+
+	6) What is this REST endpoint actually doing?
+	   -- Returning a list of history information for a given applicationId
+
+
+
+What is the plan for coding
+---------------------------
+ 1. Create a new branch  (either from where you are or from where development)
+
+ 2. If you don't have the DTO, then you create one
+    -- with the 5 fields
+
+ 3. If you don't have a service class, then you create one -- give it a name MyHistoryService
+    a. Add a logger
+    b. Add a method that takes-in the applicationId and filterNumber and returns some FAKE data
+       1) Create the method
+       2) In the method create an ArrayList of these DTO objects
+       3) Create a few DTOs
+       4) Add the DTOs to the list
+       5) returmn the list
+
+ 4. If you don't have a controller class, then you create one -- give it a name MyHistoryController
+    Your controller method needs some checks
+     a. If the passed-in applicationId does not exist,         then return a 400 Bad Request and some sensible error message -- e.g., the passed-in applicationId was not found in the system
+     b. If the fliter number is outside of the accepted range, then return a 400 Bad Request and some sensible error message -- e.g., the passed-in filter number is not valid
+     c. Call your service method
+
+ 5. Verify the outline works in Postman
+
+ 6. Replace the fake DTOs with some real SQL
+    a. You will need some history records in your application_history table  (start an SF328 and submit an SF328)
+    b. If you need to, modify the dates on these records so they're old
+
+ 7. Verify the real REST call works using Postman
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+After creating a new branch create a DTO (in this case I named it HistoryListDTO) make sure to use Json annotation @JsonProperty and use
+the correct variable types. Then Generate your getters and setters.
+
+package gov.dcsa.models.users;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class HistoryListDTO {
+
+    @JsonProperty("old_state_name")
+    private String oldStateName;
+
+    @JsonProperty("new_state_name")
+    private String newStateName;
+
+    @JsonProperty("author_full_name")
+    private String authorFullName;
+
+    @JsonProperty("assigned_user")
+    private String assignedUser;
+
+    @JsonProperty("action_date")
+    private String actionDate;
+
+    public String getOldStateName() {
+        return oldStateName;
+    }
+
+    public void setOldStateName(String oldStateName) {
+        this.oldStateName = oldStateName;
+    }
+
+    public String getNewStateName() {
+        return newStateName;
+    }
+
+    public void setNewStateName(String newStateName) {
+        this.newStateName = newStateName;
+    }
+
+    public String getAuthorFullName() {
+        return authorFullName;
+    }
+
+    public void setAuthorFullName(String authorFullName) {
+        this.authorFullName = authorFullName;
+    }
+
+    public String getAssignedUser() {
+        return assignedUser;
+    }
+
+    public void setAssignedUser(String assignedUser) {
+        this.assignedUser = assignedUser;
+    }
+
+    public String getActionDate() {
+        return actionDate;
+    }
+
+    public void setActionDate(String actionDate) {
+        this.actionDate = actionDate;
+    }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Now create your Service (in this case I named it MyHistoryService.java) You will need to use the @Service annotation for Json.
+
+package gov.dcsa.services;
+
+import gov.dcsa.models.users.HistoryListDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class MyHistoryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(LookupService.class); ****this is your logger call****
+
+    public List<HistoryListDTO> getHistoryList(Integer applicationId, Integer filterNumber){ ****This is the method used to return a List of dtos****
+
+        List<HistoryListDTO> historyList = new ArrayList<>(); ****this is how you allocate space for your dto objects****
+
+        HistoryListDTO dto1 = new HistoryListDTO(); ****first dto with array list****
+
+        dto1.setOldStateName("User Started Filling-in");
+        dto1.setNewStateName("Entity Mgr Review");
+        dto1.setAuthorFullName("John Smith");
+        dto1.setAssignedUser("John Smith");
+        dto1.setActionDate("08/25/2022 13:53:44");
+
+
+        HistoryListDTO dto2 = new HistoryListDTO();****second dto with array list****
+
+        dto2.setOldStateName("User Started Filling-in");
+        dto2.setNewStateName("Entity Mgr Review");
+        dto2.setAuthorFullName("Jane");
+        dto2.setAssignedUser("Jane Smith");
+        dto2.setActionDate("09/30/2022 14:00:44");
+
+        historyList.add(dto1);****you use the .add to add dto1 to historyList List variable name****
+
+        historyList.add(dto2);****you use the .add to add dto2 to historyList List variable name****
+
+        return historyList;****Return the whole historyList****
+    }
+
+}
+****NOTE*****This is hard coded data, not pulled from a database yet*********************
+-----------------------------------------------------------------------------------------------------------------------------------------------
+Next you will create your controller where you will code your REST call. You will need to use the Json annotation @Controller. If you
+are injecting services you will need to use the @Resource Json annotation. You will need another logger call. Make sure to refer to your
+REST call contract when creating your RESt end point method.
+
+package gov.dcsa.controllers;
+
+
+import gov.dcsa.models.msm.MsmAdminDTO;
+import gov.dcsa.models.users.HistoryListDTO;
+import gov.dcsa.services.ApplicationService;
+import gov.dcsa.services.MyHistoryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+
+import javax.annotation.Resource;
+import java.util.List;
+
+
+@Controller
+public class MyHistoryListController {
+    private static final Logger logger = LoggerFactory.getLogger(MyHistoryListController.class);
+
+    @Resource
+    private MyHistoryService myHistoryService;
+
+    @Resource
+    private ApplicationService applicationService;
+
+
+
+    @RequestMapping(value = "/api/reports/history/list/{applicationId}/{filterNumber}", method = RequestMethod.GET, produces = "application/json")
+    @PreAuthorize("hasAnyRole('FRMS_SUPERUSER', 'FRMS_USER')")
+    public ResponseEntity<?> getHistoryList(@PathVariable(name = "applicationId") Integer aApplicationId,***Json needs the @PathVariable
+                                           @PathVariable(name = "filterNumber") Integer aFilterNumber) {
+        logger.debug("getHistoryList has been started.");
+
+        if (applicationService.doesApplicationIdExist(aApplicationId)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body("the passed-in applicationId was not found in the system");
+
+        }
+        if (aFilterNumber > 1 && aFilterNumber < 5){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body("the passed-in filter number is not valid");
+
+        }
+
+        List<HistoryListDTO> historyListDTO = myHistoryService.getHistoryList(aApplicationId, aFilterNumber);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(historyListDTO);
+    }
+
+}

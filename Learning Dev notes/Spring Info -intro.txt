@@ -1,0 +1,145 @@
+Order of Operations in Spring-Boot Java Program
+-----------------------------------------------
+
+	You launched the debugger on the backend
+	----------------------------------------
+	1. Application.main()
+
+	2. The main starts-up Spring
+
+		SpringApplication app = new SpringApplication(Application.class);
+        app.setBannerMode(Banner.Mode.OFF);
+        app.run(args);
+
+
+	3. Spring starts-up
+
+		-- Spring is looking for classes with the @Controller or @Service annotation
+
+		-- It found your MyController
+		-- It found your MyService
+
+			a. Spring calls new on your @Controller and @Service classes 	--> The constructor gets called
+				(spring makes one copy of each controller and service)
+
+
+			b. Spring injects dependencies
+			-- All of those @Resource and @Value annotations get injected
+
+
+			c. Post-Construct method gets called (if there is one)           --> calls init()
+				-- used to check property values
+				-- used to initialize frequently-used values
+
+
+
+
+	4. Web App Listening for Requests
+
+
+
+
+
+	Dependencies
+	------------
+		MyController class
+			--> Depends upon MyService
+					--> Depends upon DataSource
+
+
+
+		Spring creates the DataSource **FIRST**
+		Spring injects the DataSource into MyService **SECOND**
+		Spring injects the MyService into MyController **THIRD**
+
+
+
+
+	Application Context
+	-------------------
+
+
+
+
+
+@PostConstruct (init) is good for caching
+
+
+	Concluding Thoughts
+	-------------------
+	1. Spring Core provides "dependency injection" -- e.g., we can inject services around  (but only if you're in the box)
+		-- We use the @Controller, @Service, @Bean annotations to put your class in the box
+
+
+	2. Spring-JDBC is a different library that we use to make database calls
+		-- If you're using the JdbcTemplate, you're using spring-jdbc to talk to a database
+		-- If you're using the NamedParamterJdbcTemplate, you're using spring-jdbc to talk to a database
+
+
+    3. Spring-Web provides the @Controller annotation and lets your webapp listen for REST calls
+
+
+	4. Spring-Security enforced our authentication
+		-- If you're using the @PreAuthorize annotation, then you're using SPring-Web and Spring-Security
+
+
+
+
+	5. How did we get these libraries into our code? We use maven
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>5.3.21</version>
+        </dependency>
+
+
+
+
+
+
+
+	Maven is a java-based mechanism to import java artifacts
+
+	Java  == Light-saber
+	Maven == The Force
+
+
+	Backend:  java / maven / sql / ElasticSearch
+	---------------------------------------------
+	REST calls that run java code to run sql calls or ElasticSearch queries
+
+	We use maven to import java libraries
+	We don't have to create a postgres database driver (we'll download instead)
+	-- Backend World
+
+
+
+	Frontend:  html / css / typescript / angular / angular-material / angular-flex / ag-grid / highcharts
+	------------------------------------------------------------------------------------------------------
+	We use Node Package Manager (NPM) to import javascript libraries
+	We don't have to create a charting front-end library or a grid library (we'll download instead)
+	-- Frontend World
+
+
+
+								We Developers stand on the shoulders of giants
+
+
+						Front-end libraries						Backend-end libraries
+																-- Java    (you need a Java Runtime Edition (JRE) to run it on a box server
+						-- ag-grid								-- spring, spring-jdbc, spring-web, spring-security
+						-- highcharts							-- postgres driver
+						-- angular								-- pdfbox
+						-- angular-material						-- common langs (StringUtils)
+
+						NPM to import JS libraries				Maven to import java libraries
+
+
+
+
+						We have one-click debugging with IntelliJ
+						+ We can debug any java code (on back-end)
+						+ We can debug any typescript code (on front-end)
+
+

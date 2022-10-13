@@ -1,0 +1,302 @@
+import {Injectable} from '@angular/core';
+import {HttpClient} from "@angular/common/http";
+import {Observable} from "rxjs";
+import {environment} from "../../environments/environment";
+import {AddCommentTopicDTO} from "../models/comments/add-comment-topic-dto";
+import {GetCommentsDTO} from "../models/comments/get-comments-dto";
+import {CommentEntryDTO} from "../models/comments/comment-entry-dto";
+import {AddCommentDTO} from "../models/comments/add-comment-dto";
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CommentsService {
+
+  constructor(private httpClient: HttpClient) { }
+
+  /*
+  * This method sends a request message to get all Comments for a particular application
+  */
+  public getTopicsForSF328(applicationId: number): Observable<GetCommentsDTO[]> {
+    const restUrl = environment.baseUrl + '/api/topics/getall/' + applicationId;
+    return this.httpClient.get <GetCommentsDTO[]> (restUrl);
+
+  }
+
+  /*
+* This method sends a request message to get all Comments for a particular question
+*/
+  public getTopicsFoQuestion(applicationId: number, questionId: number): Observable<GetCommentsDTO[]> {
+    const restUrl = environment.baseUrl + '/api/topics/getall/' + applicationId + "/" + questionId;
+    return this.httpClient.get <GetCommentsDTO[]> (restUrl);
+
+  }
+
+  /*
+  * This method creates an RFI for a particular application
+   */
+  public createCommentTopic(addCommentTopicDTO:AddCommentTopicDTO): Observable<string> {
+    // Construct the URL to create a Clarification request
+    const restUrl = environment.baseUrl + '/api/topics/create';
+
+    // NOTE:  The REST call is not invoked you call subscribe() on this observable
+    return this.httpClient.post(restUrl,addCommentTopicDTO,{responseType: 'text'});
+  }
+
+  /*
+   * This method adds a comment to a specific RFI
+   */
+  public addComment(newComment:AddCommentDTO): Observable<CommentEntryDTO[]> {
+    const restUrl = environment.baseUrl + '/api/topics/comment';
+    return this.httpClient.post<CommentEntryDTO[]> (restUrl,newComment);
+
+  }
+
+
+}
+package com.lessons.models;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class AddContractSpecificationDTO {
+    @JsonProperty("classification")
+    private Integer classification;
+
+    @JsonProperty("cageCode")
+    private String cageCode;
+
+    @JsonProperty("type")
+    private Integer type;
+
+    @JsonProperty("contractNumber")
+    private String contractNumber;
+
+    @JsonProperty("primaryOrgId")
+    private Integer primaryOrgId;
+
+    @JsonProperty("csoFullName")
+    private String csoFullName;
+
+    @JsonProperty("csoPhoneNumber")
+    private String csoPhoneNumber;
+
+    @JsonProperty("csoEmail")
+    private String csoEmail;
+
+    @JsonProperty("csoAddressLine1")
+    private String csoAddressLine1;
+
+    @JsonProperty("csoAddressLine2")
+    private String csoAddressLine2;
+
+    @JsonProperty("csoCity")
+    private String csoCity;
+
+    @JsonProperty("csoState")
+    private Integer csoState;
+
+    @JsonProperty("csoZipCode")
+    private String csoZipCode;
+
+    @JsonProperty("csoFullAddress")
+    private String csoFullAddress;
+
+    @JsonProperty("startLegalBusinessName")
+    private String startLegalBusinessName;
+
+    @JsonProperty("startAddressLine1")
+    private String startAddressLine1;
+
+    @JsonProperty("startAddressLine2")
+    private String startAddressLine2;
+
+    @JsonProperty("startCity")
+    private String startCity;
+
+    @JsonProperty("startStateLookupId")
+    private Integer startStateLookupId;
+
+    @JsonProperty("startZipCode")
+    private String startZipCode;
+
+    @JsonProperty("startCountryCode")
+    private String startCountryCode;
+
+    @JsonProperty("startFullAddress")
+    private String startFullAddress;
+
+
+    // Getters and Setters
+
+    public Integer getClassification() {
+        return classification;
+    }
+
+    public void setClassification(Integer classification) {
+        this.classification = classification;
+    }
+
+    public String getCageCode() {
+        return cageCode;
+    }
+
+    public void setCageCode(String cageCode) {
+        this.cageCode = cageCode;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public String getContractNumber() {
+        return contractNumber;
+    }
+
+    public void setContractNumber(String contractNumber) {
+        this.contractNumber = contractNumber;
+    }
+
+    public Integer getPrimaryOrgId() {
+        return primaryOrgId;
+    }
+
+    public void setPrimaryOrgId(Integer primaryOrgId) {
+        this.primaryOrgId = primaryOrgId;
+    }
+
+    public String getCsoFullName() {
+        return csoFullName;
+    }
+
+    public void setCsoFullName(String csoFullName) {
+        this.csoFullName = csoFullName;
+    }
+
+    public String getCsoPhoneNumber() {
+        return csoPhoneNumber;
+    }
+
+    public void setCsoPhoneNumber(String csoPhoneNumber) {
+        this.csoPhoneNumber = csoPhoneNumber;
+    }
+
+    public String getCsoEmail() {
+        return csoEmail;
+    }
+
+    public void setCsoEmail(String csoEmail) {
+        this.csoEmail = csoEmail;
+    }
+
+    public String getCsoAddressLine1() {
+        return csoAddressLine1;
+    }
+
+    public void setCsoAddressLine1(String csoAddressLine1) {
+        this.csoAddressLine1 = csoAddressLine1;
+    }
+
+    public String getCsoAddressLine2() {
+        return csoAddressLine2;
+    }
+
+    public void setCsoAddressLine2(String csoAddressLine2) {
+        this.csoAddressLine2 = csoAddressLine2;
+    }
+
+    public String getCsoCity() {
+        return csoCity;
+    }
+
+    public void setCsoCity(String csoCity) {
+        this.csoCity = csoCity;
+    }
+
+    public Integer getCsoState() {
+        return csoState;
+    }
+
+    public void setCsoState(Integer csoState) {
+        this.csoState = csoState;
+    }
+
+    public String getCsoZipCode() {
+        return csoZipCode;
+    }
+
+    public void setCsoZipCode(String csoZipCode) {
+        this.csoZipCode = csoZipCode;
+    }
+
+    public String getStartLegalBusinessName() {
+        return startLegalBusinessName;
+    }
+
+    public void setStartLegalBusinessName(String startLegalBusinessName) {
+        this.startLegalBusinessName = startLegalBusinessName;
+    }
+
+    public String getStartAddressLine1() {
+        return startAddressLine1;
+    }
+
+    public void setStartAddressLine1(String startAddressLine1) {
+        this.startAddressLine1 = startAddressLine1;
+    }
+
+    public String getStartAddressLine2() {
+        return startAddressLine2;
+    }
+
+    public void setStartAddressLine2(String startAddressLine2) {
+        this.startAddressLine2 = startAddressLine2;
+    }
+
+    public String getStartCity() {
+        return startCity;
+    }
+
+    public void setStartCity(String startCity) {
+        this.startCity = startCity;
+    }
+
+    public Integer getStartStateLookupId() {
+        return startStateLookupId;
+    }
+
+    public void setStartStateLookupId(Integer startStateLookupId) {
+        this.startStateLookupId = startStateLookupId;
+    }
+
+    public String getStartZipCode() {
+        return startZipCode;
+    }
+
+    public void setStartZipCode(String startZipCode) {
+        this.startZipCode = startZipCode;
+    }
+
+    public String getStartCountryCode() {
+        return startCountryCode;
+    }
+
+    public void setStartCountryCode(String startCountryCode) {
+        this.startCountryCode = startCountryCode;
+    }
+
+    public String getStartFullAddress() {
+        return startFullAddress;
+    }
+
+    public void setStartFullAddress(String startFullAddress) {
+        this.startFullAddress = startFullAddress;
+    }
+
+    public String getCsoFullAddress() { return csoFullAddress; }
+
+    public void setCsoFullAddress(String csoFullAddress) { this.csoFullAddress = csoFullAddress; }
+}

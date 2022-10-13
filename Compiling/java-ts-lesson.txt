@@ -1,0 +1,132 @@
+MAIN
+
+package org.example;
+import com.lessons.OracleReport;
+import com.lessons.PostgresReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+
+/**
+ * Hello world!
+ *
+ */
+public class App
+{
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
+
+    /**
+     * This is the main class
+     * @param args holds command-line arguments as a fixed array of strings
+     */
+    public static void main( String[] args )
+    {
+        //Create a data source object
+        SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
+        dataSource.setUsername("bogus_user");
+        dataSource.setPassword("secret");
+        dataSource.setUrl("jdbc:postgresql://localhost:5432/bogus_db");
+
+        logger.debug("main() started.");
+
+        logger.info("Hi Mom!!!!");
+
+        OracleReport oracleReport = new OracleReport();
+
+        String oracleTime = oracleReport.getDatabaseTime();
+
+        PostgresReport postgresReport = new PostgresReport(dataSource);
+
+        PostgresReport postgresReport2 = new PostgresReport(dataSource);
+
+        String time = postgresReport.getDatabaseTime();
+
+        logger.debug("main() finished. oracleTime={}", oracleTime);
+    }
+}
+
+
+Java
+
+package com.lessons;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class OracleReport {
+    private static final Logger logger = LoggerFactory.getLogger(OracleReport.class);
+
+    public OracleReport(){
+        logger.debug("constructor was called");
+    }
+
+    public String getDatabaseTime(){
+
+        String time = "5:39";
+
+        return time;
+
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+package com.lessons;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+
+import javax.sql.DataSource;
+
+
+public class PostgresReport {
+    private static final Logger logger = LoggerFactory.getLogger(PostgresReport.class);
+
+    private DataSource ds;
+
+    public PostgresReport(DataSource aDatasource){
+
+        this.ds = aDatasource;
+        logger.debug("constructor is here");
+    }
+
+
+    /**
+     * Get a datasource object
+     * Run a SQL query
+     * Send the results to the logger
+     */
+    public String getDatabaseTime() {
+        logger.debug("runReport() started.");
+
+
+
+        //Create a new JdbcTemplate object
+        JdbcTemplate jt = new JdbcTemplate(ds);
+        String sql = "Select now()";
+
+        //Use the JdbcTemplate object to run a query and get a result
+        String databaseTime = jt.queryForObject(sql, String.class);
+        Integer tableCount  = jt.queryForObject("select count(table_name) from information_schema.tables", Integer.class);
+
+        logger.debug("getDatabaseTime() returns {}", databaseTime);
+
+
+
+        logger.debug("runReport() finished.");
+
+        logger.debug("I found {} tables {}", tableCount, databaseTime);
+        return databaseTime;
+    }
+}
+

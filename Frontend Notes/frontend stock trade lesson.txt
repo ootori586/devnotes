@@ -1,0 +1,278 @@
+
+	Frontend Exercises
+	------------------
+
+    1. Generate a DTO -- StockTradeDTO
+		numeric id
+		string  trade_date
+		numeric price
+		numeric total_shares
+
+
+	2. Generate a service -- call it MyBrokerService
+
+	3. Add a public method called getAllStockTrades()
+		-- Returns an observable that holds an array of StockTradeDTOs
+		-- Fill-in this public method
+		-- Create a local array
+		-- put in some fake data
+		-- return it
+
+
+	4. Create a new page
+		a. Inject your service
+
+	5. Initialize the observable so we can use an async pipe
+		a. You create a public observable  (that holds the array of stock trade DTOs)
+		b. You need to initialize this observable
+			-- Use the injected service to initialize the observbale
+
+
+	6. Use the async pipe to display the array of data
+
+		HTML needs the data -- needs the array of StockTradeDTOs
+
+		a. Get the layout
+
+				<div fxLayout="column">
+
+					<div>Trade1</div>
+
+					<div>Trade2</div>
+
+					<div>Trade3</div>
+
+				</div>
+
+		b. Replace the Trade1 place holder with a card
+
+			<mat-card class="mat-elevaation-z4">
+				<mat-card-title>Stock Trade 1</mat-card-title>
+				<mat-card-content>
+
+				</mat-card-content>
+			</mat-card>
+
+		c. Copy the mat-cards over the Trade1, Trade2, and Trade3
+
+
+				<div fxLayout="column">
+
+					<div>
+						<mat-card>....</mat-card>
+					</div>
+
+					<div>
+						<mat-card>....</mat-card>
+					</div>
+
+					<div>
+						<mat-card>....</mat-card>
+					</div>
+
+				</div>
+
+
+		d. Use the async pipe and replace it with a for loop
+
+		---------------------------------------
+		| My Stock Trades
+		|
+		|
+		| +---------------------------------------
+		| | Trade 1
+		| |
+		| | Date:  trade-date
+        | | Price: trace price
+        | | Total Shares:  total-shares
+		| +---------------------------------------
+		|
+		| +---------------------------------------
+		| | Trade 2
+		| |
+		| | Date:  trade-date
+        | | Price: trace price
+        | | Total Shares:  total-shares
+		| +---------------------------------------
+		|
+		| +---------------------------------------
+		| | Trade 3
+		| |
+		| | Date:  trade-date
+        | | Price: trace price
+        | | Total Shares:  total-shares
+		| +---------------------------------------
+		|
+*****************************************************************************
+GENERATE DTO
+
+------------------------------------
+1. Generate a DTO -- StockTradeDTO
+		numeric id
+		string  trade_date
+		numeric price
+		numeric total_shares
+------------------------------------
+ng g class models/stock-trade-dto --skipTests
+
+export class StockTradeDto {
+
+  public id: number;                      this is frontend so you use public variable : type/class (class is a type)
+  public trade_date: string;
+  public price: number;
+  public total_shares: number;
+}
+
+********************************************************************************
+GENERATE SERVICE
+
+------------------------------------------------------------------------
+2. Generate a service -- call it MyBrokerService
+
+	3. Add a public method called getAllStockTrades()
+		-- Returns an observable that holds an array of StockTradeDTOs
+		-- Fill-in this public method
+		-- Create a local array
+		-- put in some fake data
+		-- return it
+------------------------------------------------------------------------
+
+ng g service services/MYBroker --skipTests         *NOTE* you must type service in the terminal so that spring knows it's injectable
+
+import {Injectable} from '@angular/core';
+import {Observable, of} from "rxjs";
+import {StockTradeDto} from "../models/stock-trade-dto";
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MyBrokerService {
+
+  constructor() {
+  }
+
+  public getAllStockTrades(): Observable<StockTradeDto[]> {                  This is the method called getAllStockTrades,you need
+                                                                              to add a colon after it and has an Observable
+                                                                              with the array of data from the dto you created.
+
+    let stockTrade: StockTradeDto[] = [
+      {                                                                        you use the word "let" and create a variable that holds the array in the dto
+        id: 20,                                                                This is the fake data formatted in curly brace syntax
+        trade_date: "10/12/2022",
+        price: 30,
+        total_shares: 100
+
+      }, {
+        id: 30,
+        trade_date: "11/30/2022",
+        price: 50,
+        total_shares: 200
+      }, {
+        id: 40,
+        trade_date: "1/1/2022",
+        price: 50,
+        total_shares: 300
+      }
+
+    ]
+
+   return of(stockTrade);                                                            Return the fake data using "return" and the "of()" method
+  }                                                                                   with the variable (stockTrade) that holds the array of data
+}                                                                                      in its parameter.
+************************************************************************
+GENERATE A COMPONENT
+
+4. Create a new page
+		a. Inject your service
+
+	5. Initialize the observable so we can use an async pipe
+		a. You create a public observable  (that holds the array of stock trade DTOs)
+		b. You need to initialize this observable
+			-- Use the injected service to initialize the observable
+
+
+
+ng g component/stockTrade --skipTests
+
+
+
+stock-trade.component.ts
+______________________________________________________________________
+import { Component, OnInit } from '@angular/core';
+import {MyBrokerService} from "../../services/my-broker.service";
+import {Observable} from "rxjs";
+import {StockTradeDto} from "../../models/stock-trade-dto";
+
+@Component({
+  selector: 'app-stock-trade',
+  templateUrl: './stock-trade.component.html',
+  styleUrls: ['./stock-trade.component.css']
+})
+export class StockTradeComponent implements OnInit {
+
+  public stockTradesObs: Observable<StockTradeDto[]>                         This is how you create a public Observable in your ts component *NOTE ad "Obs" on the end of your variable name
+                                                                               The type after the colon will be the Observable with the Dto between carrot symbols.
+
+  constructor(private myBrokerService: MyBrokerService) { }                                         Inject the myBrokerService into the constructor as private
+
+  ngOnInit(): void {
+
+    this.stockTradesObs = this.myBrokerService.getAllStockTrades();              Initialize the observable by assigning your public variable the method in your service that hold the fake data
+  }
+
+}
+----------------------------------------------------------------------------------
+Stock-trade.component.html
+                                                                            make an ng-container to contain the html component
+
+<ng-container *ngIf="(this.stockTradesObs | async) as stockTrades">       This is the async pipe that will display your data. Use an ngIf and use the variable used in
+                                                                           the OBS variable created in the ts component "(this."" | async)" then use "as" to assign it a new variable
+                                                                           to use in the html component.
+<div fxLayout="column">
+                                                                     This lets you know the data will be displayed in a column
+
+  <ng-container *ngIf="stockTrades.length==0">                        This is an if statement that has the logic of, if there is no stock trade data (the array length = 0, then
+    There are no stock trades                                          return a message saying "There are no stock trades".
+  </ng-container>
+
+  <ng-container *ngIf="stockTrades.length>0">                         This if statement's logic is if the array length is greater than 0, a message displays "There are ? trades"
+    There are {{stockTrades.length}} trades                             {{the code inside the double curly braces grabs the array length of the stockTrades array and displays it}}
+
+
+  <ng-container *ngFor="let stockTrade of stockTrades; let counter= index">      This whole block allows you to display consecutive data using the same layout block.
+  <div>
+    <mat-card class="mat-elevation-z4">
+      <mat-card-title>Stock Trade {{counter +1}}</mat-card-title>          This is the Title for each of the Stock Trade data groups. Adding the adding {{counter +1}} allows the
+      <mat-card-content>                                                   the Stock Trade title number to change incrementally by 1.
+
+        <div fxLayout="column">
+
+        <mat-form-field>
+          <mat-label>Date</mat-label>                                     Label for Date data
+          <input matInput readonly value="{{stockTrade.trade_date}}"/>    readonly cannot be edited, matInput tag pulling the value from the stockTrade array data trade_date
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Price</mat-label>                                    Label for Price data
+          <input matInput readonly value="{{stockTrade.price}}"/>         readonly cannot be edited, matInput tag pulling the value from the stockTrade array data price
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Total Shares</mat-label>                             Label for Total Shares data
+          <input matInput readonly value="{{stockTrade.total_shares}}"/>   readonly cannot be edited, matInput tag pulling the value from the stockTrade array data total_shares
+        </mat-form-field>
+
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+  </ng-container>
+
+  </ng-container>
+
+
+
+
+</div>
+</ng-container>
