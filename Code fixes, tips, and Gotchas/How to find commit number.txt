@@ -1,0 +1,7 @@
+In order to find out your commit number and compare it to the slider service log when using the bdp to make sure that you
+are using the right branch when testing. Enter this line in your intellij terminal
+
+git log -n 1
+
+The numeric value in this line will be the last commit in git lab.
+If you type in 2, it will give you the last 2 commits and so forth.

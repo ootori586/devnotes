@@ -1,0 +1,55 @@
+--getting all the submitter uploads
+select d.id as id, d.original_filename as originalFilename, d.page_info_text  as documentPageNumber,
+       to_char(d.created_date, 'YYYY-mm-dd') as uploadDate, u.full_name as uploadAuthorFullName, d.is_pdf as isPdf,
+       case
+           when d.document_type = 2 THEN 'Risk Indicator Report'
+           when d.document_type = 3 THEN 'FOCI Business Assessment'
+           when d.document_type = 4 THEN 'Risk Mitigation Strategy'
+           when d.document_type = 5 THEN 'Commitment Letter'
+           else (select name from sections where id = (select section_id from questions where id =d.question_id))
+           end as sectionName
+from documents d
+join users u on (d.created_userid = u.id)
+where d.sf328_id =10022
+order by d.created_date desc;
+
+--part 1 getting the cage code for the passed in sf328
+select s.cage_code_id
+from sf328s s
+where s.id=10022;
+
+-- part 2 getting the contract ids that match the cage code
+select * from contracts_cage_codes where cage_code_id =10012;
+
+--part 3 getting the contracts from the cage code ids
+select * from documents where contract_id =10015 or contract_id= 10011;
+
+select d.*
+from documents d
+where d.sf328_id =10022;
+
+select A.id as id, A.original_filename as originalFilename, A.page_info_text  as documentPageNumber,
+        to_char(A.created_date, 'YYYY-mm-dd') as uploadDate, A.full_name as uploadAuthorFullName, A.is_pdf as isPdf,
+         A.sectionName as sectionName
+    from
+(select d.id, d.original_filename, d.page_info_text, d.created_date, u.full_name, d.is_pdf,
+       'GCA uploaded file' as sectionName
+from sf328s s
+join contracts_cage_codes ccc on (s.cage_code_id = ccc.cage_code_id)
+join documents d on (d.contract_id = ccc.contract_id)
+join users u on (d.created_userid = u.id)
+where s.id=10022
+UNION
+select d.id, d.original_filename, d.page_info_text, d.created_date, u.full_name, d.is_pdf,
+       case
+           when d.document_type = 2 THEN 'Risk Indicator Report'
+           when d.document_type = 3 THEN 'FOCI Business Assessment'
+           when d.document_type = 4 THEN 'Risk Mitigation Strategy'
+           when d.document_type = 5 THEN 'Commitment Letter'
+           else (select name from sections where id = (select section_id from questions where id =d.question_id))
+           end as sectionName
+from documents d
+         join users u on (d.created_userid = u.id)
+where d.sf328_id =10022) A
+order by A.created_date desc;
+

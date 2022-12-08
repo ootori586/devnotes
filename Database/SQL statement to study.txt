@@ -1,0 +1,28 @@
+--part 1 get the cage code id for the given sf328id
+SELECT s.cage_code_id from sf328s s where s.id=10019;
+
+select * from contracts_cage_codes;
+--we got the cagecode id for our sf328id
+select * from cage_codes where id =10013;
+
+--part 2 we use that cage code id to get the contract information
+select * from contracts_cage_codes where cage_code_id=10013;
+
+-- part 3 if I have contract information to get the GCA (created user id)
+select c.contract_name, c.contract_number from contracts c where c.id=10011;
+
+--part 4 get the info from the users table for the user id
+select u.full_name, u.phone_number, u.email from users u where u.id=10000;
+
+
+
+select c.contract_name, c.contract_number,u.full_name, u.phone_number, u.email
+from sf328s s
+join cage_codes cc on (s.cage_code_id =cc.id)
+join contracts_cage_codes ccc on (ccc.cage_code_id =cc.id)
+join contracts c on (c.id = ccc.contract_id)
+join users u on (u.id = c.created_userid)
+where s.id=10019;
+
+
+alter table documents alter column sf328_id drop not null; //this is how you remove a null check from a column

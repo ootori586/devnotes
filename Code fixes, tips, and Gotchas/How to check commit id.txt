@@ -1,0 +1,5 @@
+Go to intellij terminal
+
+git log -n 1    // This lets you see the id of your last commit
+
+git log --format=oneline   //This lets you see all commits/ids from the lastest version

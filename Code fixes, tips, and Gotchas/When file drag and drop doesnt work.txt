@@ -1,0 +1,7 @@
+In the HTML component for upload dialog make sure that
+
+<label ng2FileDrop [uploader]="uploader"
+
+is not hanging there waiting for us to communicate back to it, so we must add this line of code
+
+(onFileDrop)="this.onFileSelected($event)">.

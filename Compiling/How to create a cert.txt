@@ -30,6 +30,7 @@ Procedure
     NOTE:  This assumes that the puppet master has an IP address of 10.1.21.100 or 10.1.23.100
     unix> scp manderson@10.1.21.100:/tmp/*.p12 .    # The dot means to copy the file to the current directory
     unix> scp manderson@10.1.23.100:/tmp/*.p12 .
+    unix> scp manderson@10.1.24.100:/tmp/*.p12 .
 
 8. In the file explorer on windows, navigate to the Melanie Anderson folder in the users folder and copy/paste certs into
    certificates folder on c:drive

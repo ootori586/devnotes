@@ -1,0 +1,264 @@
+Frontend Page Life Cycle for Regular Page
+-----------------------------------------
+ 1. User goes to the page
+    a. Go directly to a bookmarked page
+    b. Use our navbar to go to a page
+
+ 2. Router checks the canActivate guards to do stuff before the page is loaded
+    -- canActivate thing is called in guards
+             app.module.ts
+                              '/page/stuff',       component:  MySillyComponent,       canActivate: [UserIsRegisteredGuard, PageGuard]
+
+ 3. constructor is called
+    -- Angular injects the services into your component
+
+ 4. ngOnInit is called
+    -- initialize an observable for a REST call
+
+ 5. HTML is rendered
+    -- use async pipe to invoke the REST call and display the goodies
+
+ 6. afterViewInit() is called
+
+ 7. **LEAVES** the page
+    ngOnDestroy() is called
+
+
+
+
+Frontend Page Life Cycle for Chart Page
+---------------------------------------
+ 1. User goes to the page
+    a. Go directly to a bookmarked page
+    b. Use our navbar to go to a page
+
+ 2. Router checks the canActivate guards to do stuff before the page is loaded
+    -- canActivate thing is called in guards
+             app.module.ts
+                              '/page/stuff',       component:  MySillyComponent,       canActivate: [UserIsRegisteredGuard, PageGuard]
+
+ 3. constructor is called
+    -- Angular injects the services into your component
+
+ 4. ngOnInit is called
+    -- initialize an observable for a REST call
+
+ 5. HTML is rendered
+    -- use async pipe to invoke the REST call and display the goodies
+
+ 6. afterViewInit() is called
+    -- At this point, the chart div is guaranteed to exist
+    -- Now, it's safe to load the chart
+
+	-- If a user goes directly to the chart page (using a bookmark)
+       Then we need to call setTimeout
+		   -- Gives Angular time to do another "change detection"
+
+	-- CHART LOADS on the PAGE!!!
+
+	-- IMPORTANT RULE WITH HIGHCHARTS:  You cannot render a chart until the div exists
+                                              Highcharts.chart('chart1', this.pageOptions1');
+
+ 7. **LEAVES** the page
+    ngOnDestroy() is called
+
+
+
+
+
+Frontend Page Life Cycle for Client-Side Grid Page       (you need onGridReady for the grid to tell you it's initialized)
+--------------------------------------------------
+ 1. User goes to the page
+    a. Go directly to a bookmarked page
+    b. Use our navbar to go to a page
+
+ 2. Router checks the canActivate guards to do stuff before the page is loaded
+    -- canActivate thing is called in guards
+             app.module.ts
+                              '/page/stuff',       component:  MySillyComponent,       canActivate: [UserIsRegisteredGuard, PageGuard]
+
+ 3. constructor is called
+    -- Angular injects the services into your component
+
+ 4. ngOnInit is called
+
+
+ 5. HTML is rendered
+
+    <ag-grid-angular
+			(onGridReady)="this.onGridReady($event)"              Once ag-grid is fully initialized, call this method to start loading data
+	</ag-grid-angular>
+
+
+
+ 6. afterViewInit() is called
+
+
+ 7. onGridReady() is called because the ag-grid is fully initialized and we told it to call this method
+    a. Invoke a REST call to get the user's preferences
+    b. Invoke a REST call to load the client-side grid
+
+ 8. **LEAVES** the page
+    ngOnDestroy() is called
+
+
+
+    CLIENT SIDE Ag-grids:  Load the data in onGridReady()
+                           You cannot load the grid until the grid is fully initialized
+
+
+
+
+
+
+Frontend Page Life Cycle for Server-Side Grid Page
+--------------------------------------------------
+ 1. User goes to the page
+    a. Go directly to a bookmarked page
+    b. Use our navbar to go to a page
+
+ 2. Router checks the canActivate guards to do stuff before the page is loaded
+    -- canActivate thing is called in guards
+             app.module.ts
+                              '/page/stuff',       component:  MySillyComponent,       canActivate: [UserIsRegisteredGuard, PageGuard]
+
+ 3. constructor is called
+    -- Angular injects the services into your component
+
+ 4. ngOnInit is called
+
+
+ 5. HTML is rendered
+
+    <ag-grid-angular
+			(onGridReady)="this.onGridReady($event)"              Once ag-grid is fully initialized, call this method to start loading data
+	</ag-grid-angular>
+
+
+
+ 6. afterViewInit() is called
+
+
+ 7. onGridReady() is called because the ag-grid is fully initialized and we told it to call this method
+    a. Invoke a REST call to get the user's preferences
+    b. Tell the grid where the serverSideDataSource is
+
+         serverSideDataSource is a map and it has a key called "getRows"
+
+			private serverSideDataSource: ServerSideDataSource =
+			{
+				getRows: () => {
+
+				}
+			}
+
+ 8. ag-grid uses the serverSideDataSource to load the first page of data
+
+
+ 9. **LEAVES** the page
+    ngOnDestroy() is called
+
+
+
+
+*************************************************************************************************************************
+
+Matt G: 28c
+Alex B: 28b
+Mela A: 16j
+
+
+28d -- save which charts are visible and the order
+--------------------------------------------------
+[1, 2, 3]  -- Show chart 1, 2, 3
+
+[3, 1, 2]  -- Show chart 3, 1, 2  (in that order)
+
+
+[  ]       -- Show no charts
+
+
+
+
+
+
+What's the order of operations on a chart page
+----------------------------------------------
+ 1. User clicks on a chart nav link
+
+	-- Are we authorized to **LEAVE** the page
+	a. Ask the router to leave the page -- canDeactivate is called --> we use it for a save && wait operation in sf328
+	b. If canDeactivate returns TRUe --> then leave the page
+	c. ngOnDestroy on the current page is called
+
+
+
+ 2. Has to do with the router?!!
+    Router checks the guards  -- canActivate is the method
+
+	-- Router calls canActivate() code
+	-- If canActivate() returns TRUE, then the router directs you to the page
+	-- If canActivate() returns an observable<boolean>, then......router subscribes and user WAITS
+
+
+ 3. Constructor is called
+
+ 4. ngOnInit() is called
+
+ 5. HTML is rendered
+
+ 6. ngAfterViewInit() is called
+
+ 7. load data for the charts
+		You would have a backend REST endpoint
+		You would subscribe to your frontend service
+
+
+		// What does setTimeout do?  Run another refresh cycle, delay the code by 25 msecs, then run the code
+		// -- This gives HighCharts more time to initialize its stuff
+		setTimeout( () => {
+
+			this.dashboardService.getMyData().subscribe( (aData: MyDTO) => {
+				// We have the data
+
+				// We load the data into the chart
+				this.chartOptions.series[0].data = aData.chartData;
+
+				// Render the chart
+				Highcharts.chart('chart1Div', this.chartOptions);
+
+				// Reflow on all charts (loop)
+
+			} );  // End of the subscribe
+
+		}, 25);   // end of setTimeout
+
+
+
+
+		HTML			Angular			TypeScript class
+						Keeps it
+						In Sync
+
+
+
+		<!-- Textbox -->
+		<input type="text" matInput formControlName="name"/>										this.myForm.controls.name.setValue('Adam');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
