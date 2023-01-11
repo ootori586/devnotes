@@ -1,0 +1,6 @@
+Go to settings: security: View Certs: delete cert that is auto defaulting.
+
+In the browser bar type: about:config
+
+and change parameter to false: security.remember_cert_checkbox_default_setting
+

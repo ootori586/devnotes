@@ -53,3 +53,167 @@ from documents d
 where d.sf328_id =10022) A
 order by A.created_date desc;
 
+
+
+
+
+					SQL Joins old style
+
+						-- Cartesion Product    if tableA has 3 rows and table B has 8 rows ---> join results in 24 rows
+						select a.*, b.*
+						from tableA a, tableB b
+						where a.id = b.sales_person_id
+
+
+
+
+					SQL Joins current style (ANSI standard)
+
+						select a.*, b.*
+						from tableA a
+						JOIN tableB b ON (a.id = b.sales_person_id)
+						WHERE a.id=this OR b.something is null
+
+						ORDER BY 1, 2, 3, a.col, b.col
+						LIMIT 5
+
+
+
+
+						LEFT JOIN
+
+
+
+						RIGHT JOIN
+
+
+
+						OUTER JOIN -- fucking stupid / I have never used them in a real programming assignment
+
+
+						INNER JOIN -- plain old JOIN   (record must exist in both tables)
+
+
+
+
+
+		Backend Developers
+		------------------
+		1) Use java to run SQL queries
+
+		2) Use java to run ElasticSearch queries
+
+		3) The value-added part is the SQL query or ElasticSearch query  (not the java stuff / executing SQL is EASY because we have spring-jdbc / JdbcTemplate )
+		   -- So, a great backend developer needs to be GREAT at SQL and/or ElasticSearch
+
+
+
+
+
+
+
+
+				Sales						Users
+				------------------- 		---------------------
+				id, sales_person_id			id
+					2						1
+					2						2
+					51						3
+
+
+
+        Subtle SQL Lessons
+		------------------
+		A) When running your SQL, you want to *KNOW* the answer ahead of time
+			-- So, explore your data **FIRST**
+			-- Build your SQL **SECOND**
+
+
+		B) Use SchemaSpy to explore the tables
+			-- Run it a lot / the database design changes / so you need to run schema spy to update it
+			-- Bookmark the index.html
+
+
+		C) If there are no arrows in SchemaSpy, then there are no foreign keys
+		   DANGEROUS!!!
+
+
+		D) SQL Columns should be homogenous
+			-- Don't combine a String and a number into one column
+			   BETTER:  Return the number or null and have the front-end format/display it differently
+
+				In your DTO
+
+
+				private class myDTO {
+
+						@JsonProperty("userid")
+						private Integer userid;
+
+				}
+
+
+		E) SQL is powerful
+			Hibernate		--> You provide java classes --> It generates the SQL
+			ORM -- Object Relational Mapping
+
+
+			What we do in our project
+			-------------------------
+			+ We can optimize our SQL
+			+ We have all of the power
+			- Requires devs to know SQL
+
+				Java Developer wants to run some SQL
+						|
+						V
+					Insert our own CUSTOM SQL into code
+						|
+						|
+						V
+					Execute SQL    (JdbcTemplate stuff)
+						|
+						V
+					Get response from database
+
+
+
+
+			Hibernate Developers
+			--------------------
+			+ Devs do not have to know SQL
+			- Generated SQL sucks
+			- Runs substantially slower
+
+				Java Developer wants to run some SQL
+						|
+						V
+					Write SQL classes for tables (if 100 tables, then 100 classes)
+						|
+						|
+						|
+						V
+					Execute SQL you take your table class and call methods Sales.getById(5);
+						|
+						V
+					Hibernate generates the SQL
+						|
+						|
+  					Execute SQL    (JdbcTemplate stuff)
+						|
+						V
+					Get response from database
+
+
+
+select coalesce(u.full_name, 'Unknown') as full_name, s.sell_date, s.value //coalesce is similar to using a CASE statement. In this example we want to change
+from sales s                                                               // null to unknown.
+LEFT JOIN users u on (s.salesperson_id = u.id);         // LEFT JOIN grabs everything from the sales table and grabs only the user id from the users table
+
+select
+    case
+        when u.full_name is null then 'Unknown'
+        else u.full_name
+        end as full_name, s.sell_date, s.value
+from sales s
+         FULL OUTER JOIN users u on (s.salesperson_id = u.id);     //full outer join to get all users and sales transactions from users and sales tables

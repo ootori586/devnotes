@@ -1,0 +1,34 @@
+Frontend Lesson 22z Tips and Tricks
+
+in .ts file
+add these params
+
+private textFilterParams = {
+	filterOptions: ['contains', 'notContains'],
+	caseSensitive: false,
+	debounceMs: 200,
+	suppressAndOrCondition: true,
+  };
+
+ public defaultColDefs: any = {
+	sortable: true,
+	filter: true,
+	floatingFilter: true,	// Causes the filter row to appear below column names
+  };
+
+
+  public columnDefs = [
+   {
+  	field: 'id',
+  	headerName: 'Action',
+  	cellRenderer: 'actionCellRenderer',
+  	filter: false
+   },
+   {
+  	field: 'cage_code',
+  	headerName: 'CAGE Code',
+  	filter: 'agTextColumnFilter',    // add these last two lines of code to your columns
+  	filterParams: this.textFilterParams,
+   }
+ ]
+

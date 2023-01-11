@@ -1,0 +1,11 @@
+Frontend Lesson 22j page 18
+In the the .ts component that is using the child grid, search for the frameworkComponents.
+There should be a Detail Renderer, ctrl+b into the component and ctrl+b to the .css component
+
+add this to the .css component
+:host {
+  /* This is needed to ensure that the dynamic-auto-height works in ag-grid */
+  display: inline-block;
+  width: 100%;
+
+}

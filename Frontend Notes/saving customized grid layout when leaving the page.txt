@@ -1,0 +1,240 @@
+Frontend Lesson 22j step 12 and down
+
+12.Change the front-end grid page to remember column state
+ a. Edit report-grid-view.component.ts
+
+
+b. Add private variables to the top of the class:
+  private readonly PAGE_NAME: string = "reports-grid-view";
+  private userHasPastColumnState: boolean = false;
+  private listenForGridChanges: boolean = false;
+  private saveGridColumnStateEventsSubject: Subject<any> = new Subject();
+  private saveGridEventsSubscription: Subscription;
+
+
+
+c. Change the gridOptions variable so it calls methods when a user sorts, resizes, moves columns
+  public gridOptions: GridOptions = {
+	debug: true,
+	suppressCellSelection: true,
+	rowSelection: 'multiple',  	// Possible values are 'single' and 'multiple'
+	domLayout: 'normal',
+
+	onSortChanged: () => {
+  	this.saveColumnState();
+	},
+
+	onDragStopped: () => {
+  	// User finished resizing or moving column
+  	this.saveColumnState();
+	},
+
+	onDisplayedColumnsChanged: () => {
+  	this.saveColumnState();
+	},
+
+	onColumnVisible: () => {
+  	this.saveColumnState();
+	},
+
+	onColumnPinned: () => {
+  	this.saveColumnState();
+	}
+  };
+
+
+d. Add these methods to your grid page:
+
+  private saveColumnState(): void {
+	if (this.listenForGridChanges) {
+  	// The grid has rendered data.  So, save the sort/column changes
+
+  	// Get the current column state
+  	let currentColumnState = this.gridColumnApi.getColumnState();
+
+  	// Send a message to save the current column state
+  	this.saveGridColumnStateEventsSubject.next(currentColumnState)
+	}
+  }
+
+
+  public firstDataRendered(): void {
+	// The grid is fully rendered.  So, set the flag to start saving sort/column changes
+	this.listenForGridChanges = true;
+  }
+
+e. Change the columnDefs so that the columns are sortable and resizable
+
+  public columnDefs = [
+	{
+  	field: 'id',
+  	cellClass: 'grid-text-cell-format',
+  	cellRenderer: 'actionCellRenderer',
+  	cellRendererParams: {
+    	deleteButtonGridMethod: (params: ICellRendererParams) => this.openDeleteDialog(params),
+    	editButtonGridMethod: (params: ICellRendererParams) => this.openEditDialog(params)
+  	},
+  	headerName: 'Actions',
+  	filter: false,
+  	suppressMenu: false,
+  	sortable: false,
+  	resizable: true,
+  	checkboxSelection: true
+	},
+	{
+  	field: 'name',
+  	cellClass: 'grid-text-cell-format',
+  	sortable: true,
+  	resizable: true,
+	filter: 'agTextColumnFilter'
+	},
+	{
+  	field: 'priority',
+  	cellRenderer: 'priorityCellRenderer',
+  	sortable: true,
+  	resizable: true,
+	filter: 'agTextColumnFilter'
+	},
+	{
+  	field: 'start_date',
+  	cellClass: 'grid-text-cell-format',
+  	sortable: true,
+  	resizable: true,
+	filter: 'agTextColumnFilter'
+	},
+	{
+  	field: 'end_date',
+  	cellClass: 'grid-text-cell-format',
+  	sortable: true,
+  	resizable: true,
+	filter: 'agTextColumnFilter'
+	}
+  ];
+
+f. Inject the preference service into the constructor
+
+  constructor(private gridService: GridService,
+          	private preferenceService: PreferenceService,
+          	private matDialog: MatDialog) {}
+
+
+
+
+g. Change the ngOnInit() so it saves grid events (but only after 250 milliseconds)
+
+  public ngOnInit(): void {
+
+	// Listen for save-grid-column-state events
+	// NOTE:  If a user manipulates the grid, then we could be sending LOTS of save-column-state REST calls
+	//    	The debounceTime slows down the REST calls
+	//    	The switchMap cancels previous calls
+	//    	Thus, if there are lots of changes to the grid, we invoke a single REST call using the *LAST* event (over a span of 250 msecs)
+	this.saveGridEventsSubscription = this.saveGridColumnStateEventsSubject.asObservable().pipe(
+  	    debounceTime(250),     	// Wait 250 msecs before invoking REST call
+  	    switchMap( (aNewColumnState: any) => {
+    		// Use the switchMap for its cancelling effect:
+		// On each observable, the previous observable is cancelled
+
+    	    // Return an observable
+    	    // Invoke the REST call to save it to the back end
+    	    return this.preferenceService.setPreferenceValueForPageUsingJson(Constants.COLUMN_STATE_PREFERENCE_NAME, aNewColumnState, this.PAGE_NAME)
+  	})
+	).subscribe();
+
+  }
+
+
+h.Add an ngOnDestroy method to stop listening on these subscriptions:
+
+  public ngOnDestroy(): void {
+	if (this.saveGridEventsSubscription) {
+  		this.saveGridEventsSubscription.unsubscribe();
+	}
+
+	if (this.saveGridColumnStateEventsSubject) {
+  		this.saveGridColumnStateEventsSubject.unsubscribe();
+	}
+  }
+
+
+
+
+
+i.Change the class so it implements OnDestroy by changing this line:
+
+	export class ReportGridViewComponent implements OnInit, OnDestroy {
+
+
+
+j.Change onGridReady() to get the preference values
+
+  /*
+   * The grid is ready.  So, perform grid initialization here:
+   *  1) Invoke the REST call to get the grid column state preferences
+   *  2) When the REST endpoint returns
+   * 	a) Set the grid column state preferences
+   * 	b) Load the data into the grid
+   */
+  public onGridReady(params: any): void {
+	// Get a reference to the gridApi and gridColumnApi (which we will need later to get selected rows)
+	this.gridApi = params.api;
+	this.gridColumnApi = params.columnApi;
+
+
+this.preferenceService.getPreferenceValueForPage(Constants.COLUMN_STATE_PREFERENCE_NAME, this.PAGE_NAME).subscribe( (aPreference: GetOnePreferenceDTO) => {
+  	// REST call came back.  I have the grid preferences
+
+  	if (! aPreference.value) {
+    	// There is no past column state
+    	this.userHasPastColumnState = false;
+  	}
+  	else {
+    	// There is past column state
+    	let storedColumnStateObject = JSON.parse(aPreference.value);
+
+    	// Set the grid to use past column state
+    	this.gridColumnApi.setColumnState(storedColumnStateObject);
+
+    	this.userHasPastColumnState = true;
+  	}
+
+  	// Load the grid with data
+  	this.reloadPage();
+	});
+  }
+
+
+
+k.Adjust the reloadPage() method by changing this line:
+    	this.gridApi.sizeColumnsToFit()
+
+  To this:
+  	if (! this.userHasPastColumnState) {
+    		// We did not get any column state on page load.  So, resize the columns
+    		this.gridApi.sizeColumnsToFit();
+  	}
+
+
+
+13.Change grid to call a method when the grid is rendered (by modifying report-grid-view.component.html)
+a.Edit report-grid-view.component.html
+
+
+b.Add this to <ag-grid-angular>
+    (firstDataRendered)="this.firstDataRendered()"
+
+  When completed, the grid tag should look like this:
+
+        	<!-- AG-Grid -->
+        	<ag-grid-angular
+	          	style="width: 100%; height: 100%"
+          		class="ag-theme-alpine"
+          		[rowData]="this.rowData"
+        	  	[defaultColDef]="this.defaultColDefs"
+        	  	[columnDefs]="this.columnDefs"
+       	   	[gridOptions]="this.gridOptions"
+        	  	[frameworkComponents]="this.frameworkComponents"
+         	 	(selectionChanged)="this.generateDerivedValuesOnUserSelection()"
+       	   	(firstDataRendered)="this.firstDataRendered()"
+       	   	(gridReady)="this.onGridReady($event)">
+        	</ag-grid-angular>

@@ -1,0 +1,2 @@
+cd /d c:\tools\schemaspy
+generateSchemaForPostgres_frms.bat
