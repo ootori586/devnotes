@@ -1,0 +1,4 @@
+In intellij terminal, cd to db-migrations
+
+mvn flyway:clean
+mvn flyway:migrate

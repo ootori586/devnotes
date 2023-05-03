@@ -38,3 +38,5 @@ Procedure
 9. Start up firefox and go to the tools tab-->settings--> then type "cert" in search field.
    --Import cert and type in password then click save
 
+   citadel attribute:add -u $USERNAME -a ELASTICSEARCH:ADMIN
+
