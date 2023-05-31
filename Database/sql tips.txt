@@ -1,0 +1,2 @@
+if you're using "where column = null", it's probably not doing what you want it to do
+you're probably wanting "where column is null"
