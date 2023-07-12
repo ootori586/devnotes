@@ -1,0 +1,2 @@
+Use this line of code to stop auto assigning to EMs and makes them go to EMTL's first to be assigned
+-Dsf328.auto.assign.users=false

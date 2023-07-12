@@ -1,0 +1,17 @@
+Your local ElasticSearch (by default) looks at how much free disk space you have on your laptop
+
+If you are low on disk space, your local ElasticSearch will put itself in READ ONLY mode
+
+
+
+SUGGESTION:  Turn this check off so ES runs even if you are down to your last 10 GB of space:
+
+
+a. Edit the elasticsearch.yml file:
+     c:\tools\elasticsearch-7.10.2\config\elasticsearch.yml
+
+b. Add this entry to the bottom:
+     # Tell ElasticSearch to not look at the amount of free disk space on this computer
+     cluster.routing.allocation.disk.threshold_enabled: false
+
+c. Use the services.msc to restart ElasticSearch
