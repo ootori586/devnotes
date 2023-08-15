@@ -1,0 +1,86 @@
+First creat a backend DTO that holds the value of what you want displayed. In this case, it's
+a serial number that is a string.
+
+public class GenericSerialNumberDTO {
+
+@JsonProperty("serialNumber")
+	private String serialNumber;
+
+	// Getters and Setters
+	*generate your getters and setters*
+
+}
+
+2nd, Create a service method to pull the data out of the database.**************************************************************************
+
+public GetSerialNumberDTO getSerialNumberForCi(Integer aGenericId) {             The type for the method is the DTO, an id is passed into the method
+                                                                                 from the URL in the controller because it is needed to associate the proper
+                                                                                 serial number to the id in the database
+
+        JdbcTemplate jt = new JdbcTemplate(this.dataSource);                     Pass in your datasource
+
+		String sql = "select serial_number from table where id=?";        Make your sql call (the ? is the bind variable)
+
+        String SerialNumber = jt.queryForObject(sql, String.class, aGenericId);  make a variable to hold the data
+
+        GetSerialNumberDTO dto = new GetSerialNumberDTO();                       create a new instance of your dto
+
+        dto.setSerialNumber(SerialNumber);                                        set the serial number to your setter in the dto
+
+        return dto;
+
+	}
+
+3rd, set up your controller************************************************************************************************************
+
+@RequestMapping(value = "/api/ci/serialnumber/{aGenericId}", method = RequestMethod.GET, produces = "application/json")     the genericId is passed in through the URL
+    @PreAuthorize("hasAnyRole('ROLES')")
+    public ResponseEntity<?> getSerialNumber( @PathVariable(value="aGenericId") Integer aGenericId) {                       A Path variable needs to be created so that the generic id from the URL can be passed into the controller
+        logger.debug("getSerialNumber started");
+
+        if (aGenericId <= 0) {                                                                                              Add your backend checks
+            // The docId is blank
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body("The generic Id is not valid.");
+        }
+
+        if (!enrichmentService.doesGenericIdExist(aGenericId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body("The generic Id does not exist.");
+        }
+
+        GetSerialNumberDTO SerialNumber = enrichmentService.getSerialNumberForCi(aGenericId);                               the GetSerialNumberDTO is the type and SerialNumber is the variable that equals the data from the service method along wth the passed in generic id
+
+        return ResponseEntity.status(HttpStatus.OK).body(SerialNumber);
+    }
+
+    4th, Create your frontend service****************************************************************************************************
+    public getSerialNumber(aGenericId: number) : Observable<GetSerialNumberDto>{    Create an observable holding the dto and pass in the generic id into the method parameters.
+        //Construct the URL of the REST call
+        const restUrl = environment.baseUrl + `/api/ci/serialnumber/${aGenericId}`;        This is the syntax used for things passed into the URL
+
+        return this.httpClient.get<GetSerialNumberDto>(restUrl);
+      }
+
+     5th, create your frontend dto*******************************************************************************************************
+     export class GetJwicsSerialNumberDto {
+
+       public serialNumber: string;         make sure this variable name always matches the @JsonProperty name in the backend DTO
+     }
+
+     6th, set up your typescript component********************************************************************************************
+
+     -- Inject whatever service you used into the constructor
+     -- subscribe to your observable where the form is initialized, in ngOnIniT()
+
+          this.enrichmentService.getSerialNumber(this.genericId).subscribe((aData:GetSerialNumberDto)=>{        note* The genericId was already in this method
+                                                                                                                aData is the variable name for your DTO object
+                // The REST call came back successfully
+                this.myForm.controls.jwicsSerialNumber.setValue(aData.SerialNumber);                            set the serial number into the form field on page load by setting the form control value with the serial number value from the dto object
+
+                this.originalJwicsSerialNumber = aData.SerialNumber;
+                this.listenForCheckBoxChanges();
+                this.loadingDialogInProgress = false;
+              })
