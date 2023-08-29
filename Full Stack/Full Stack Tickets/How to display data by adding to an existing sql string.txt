@@ -1,0 +1,214 @@
+In these notes, we will be adding to an already existing sql string, service, and dtos. This
+example uses a tab on the frontend to display READ ONLY data. We will be pulling 3 stored Team IDs
+from the database and displaying them on the frontend.
+
+
+Contract Number
+Status
+Date
+Team1
+Team2
+Team3
+
+On the backend DTO that holds the DTO with Contract Number, Status, and Date, modify the sql string.
+Test it out by starting a query console.
+
+To display the saved Team ids from the database, we must do a left join from the team_one, team_two and team_three
+tables. There is a string value column in the those tables that is linked to it's id number. We must associate those
+ids to the ids of the 3 teams in the contracts table.
+
+left join team_one as o1 on (c.team_one = o1.id)   the left join
+team_one                 table
+o1                       used to associate team_one table team id
+(c.team_one = o1.id)     the contracts tables team id equals the id from the team_one table
+
+o1.value as teamOne      this line takes the string in the value column of the team_one table and sets it in the
+                         backend DTO as a String and "as teamOne" how you match it to the JSON property value.
+
+String sql = "select distinct on (c.id) c.id as contractId,\n" +
+                "                      c.contract_name as contractName,\n" +
+                "                   c.contract_number as contractNumber,\n" +
+                "                      c.state as contractState,\n" +
+         ex     "                   o1.value as teamOne,\n" +
+                "                   o2.value as teamTwo,\n" +
+                "                   o3.value as teamThree,\n" +
+                "                   cs.display_name as contractStateName,\n" +
+                "                   c.assigned_userid as assignedUserId,\n" +
+                "                   to_char(c.end_date, 'mm/dd/yyyy') as contractEndDate,\n" +
+                "                   ccc2.selected as hasSelectedBoolean\n" +
+                "            from contracts c\n" +
+                "                    join contract_states cs on c.state = cs.id\n" +
+         ex     "                    left join team_one as o1 on (c.team_one = o1.id)\n" +
+                "                    left join team_two as o2 on (c.team_two = o2.id)\n" +
+                "                    left join team_three as o3 on (c.team_three = o3.id)\n" +
+                "                    left join contracts_code_codes ccc2 on (c.id = ccc2.contract_id and ccc2.selected)\n" +
+                "            where c.id = :contractId\n" +
+                "            order by c.id";
+
+
+BACKEND DTO
+*********************************************************************************************************************
+
+Add the attributes to the Data Transfer Object.
+
+@JsonProperty("teamOne") <------Json property name must match frontend dto attribute name.
+    private String teamOne;
+
+    @JsonProperty("teamTwo")
+    private String teamTwo;
+
+    @JsonProperty("teamThree")
+    private String teamThree;
+
+    ********* generate your getters and setters ********
+
+
+CONTROLLER
+**********************************************************************************************************************
+The controller does not change
+
+
+FRONTEND dto
+************************************************************************************************************************
+Add the 3 attributes/fields to your frontend dto. Make sure the variable name matches the backend Json property value.
+
+public teamOne: string;
+public teamTwo: string;
+public teamThree: string;
+
+FRONTEND COMPONENTS
+************************************************************************************************************************
+Create/generate a frontend component for the tab info.
+Since the component that is setting the tabs uses the frontend service and dto we need to pull data we will not be
+
+setting up a path in the app.modules.ts We will be using the @Input annotation to pull in the dto data from the component
+we are setting the tab in that is already using the dto we need. (see TAB TS COMPONENT section)
+
+Since we are going to be displaying this data under a tab. We must first make the tab.
+
+In the component that holds the tabs, add:
+
+<mat-tab label="Contract Info">                                                        tab label
+                  <ng-template matTabContent>
+                    <app-tab-contract-info>                                            add the tab into component app
+                    <app-tab-contract-info>
+
+                    </app-tab-contract-info>
+                  </ng-template>
+
+
+
+TAB TS COMPONENT
+************************************************************************************************************************
+Since the component that is setting the tabs uses the frontend service and dto we need, we will be using a @Input annotation
+to pull in the dto info into our new tab component.ts
+
+@Input() public contractDetails: GetContractDetailsDto;    This keeps the ts component light
+
+
+TAB HTML COMPONENT
+************************************************************************************************************************
+Always start any html code as an outline first to get the layout that you would like, then fill in
+and add things as you go.
+
+<ng-container *ngIf="(this.bannerHeightInPixelsObs | async) as bannerHeight">         no extra scroll bar when a banner is added
+    <mat-card class="mat-elevation-z2" style="margin: 20px; padding: 20px">           1 mat card with 20px margin around it
+      <mat-card-content>
+        <mat-card-title style="margin-bottom: 10px">                                  card title
+          Contract Info
+        </mat-card-title>
+
+        <div style="height:590px">
+
+        <div style="height: calc(100vh - 358px - {{ bannerHeight}})">                  adjust the height until you see no vertical scroll bar
+
+          <div fxLayout="column" style="margin-top: 20px">                             The data will be displayed as a column, not a row
+            <!-- Contract Number -->
+            <div fxLayout="row">
+              <div>
+                <b style="font-size: large">Contract Number:</b>
+              </div>
+
+              <div style="margin-left: 10px; font-size: large">{{contractDetails.contractNumber}}</div>   pass-in the the contractNumber attribute from the dto (because we used @Input in the ts)
+            </div>
+
+            <!-- Status -->
+            <div fxLayout="row"  *ngIf="this.currentTheme.isLightMode == true">                           If lightmode is selected show the status background color as the value in the css
+              <div style="margin-top: 20px">
+                <b style="font-size: large">Status:</b>
+                <b style="font-size: large; line-height: 33px;">Status:</b>
+              </div>
+              <div
+                *ngIf="contractDetails.contractState == numericConstants.OPEN_STATE_ID && contractDetails.hasSelectedBoolean"   If the contractState is open AND the boolean is true, show Awarded
+                style="margin-left: 10px;" class="light-awarded-state">Awarded
+              </div>
+              <div
+                *ngIf="contractDetails.contractState == numericConstants.OPEN_CONTRACT_STATE_ID && !contractDetails.hasSelectedBoolean" If the contractState is NOT open AND the boolean is false, show state name (ex. Open)
+                style="margin-left: 10px; margin-top: 20px;" class="light-open-state">{{contractDetails.contractStateName}}</div>
+              <div *ngIf="contractDetails.contractState == numericConstants.COMPLETED_CONTRACT_STATE_ID"                              If the contractState is completed, show completed
+                   style="margin-left: 10px; margin-top: 20px;"
+                   class="light-completed-state">{{contractDetails.contractStateName}}</div>
+              </div>
+            </div>
+
+          <div fxLayout="row" *ngIf="this.currentTheme.isLightMode == false">                                                      If darkMode is selected show the status background color as the value in the css
+            <div>
+              <b style="font-size: large; line-height: 33px;">Status:</b>
+            </div>
+            <div
+              *ngIf="contractDetails.contractState == numericConstants.OPEN_CONTRACT_STATE_ID && contractDetails.hasSelectedSF328"
+              style="margin-left: 10px;" class="dark-awarded-state">Awarded
+            </div>
+            <div
+              *ngIf="contractDetails.contractState == numericConstants.OPEN_CONTRACT_STATE_ID && !contractDetails.hasSelectedSF328"
+              style="margin-left: 10px; margin-top: 20px;" class="dark-open-state">{{contractDetails.contractStateName}}</div>
+            <div *ngIf="contractDetails.contractState == numericConstants.COMPLETED_CONTRACT_STATE_ID"
+                 style="margin-left: 10px; margin-top: 20px;" class="dark-completed-state">{{contractDetails.contractStateName}}</div>
+          </div>
+
+            <!-- End Date -->
+            <div fxLayout="row">
+              <div style="margin-top: 20px">
+                <b style="font-size: large">End Date:</b>
+              </div>
+            <div style="margin-top: 20px">
+              <div *ngIf="contractDetails.contractEndDate != null"                                                      If the end date is NOT null, display end date
+                   style="margin-left: 10px; font-size: large">{{contractDetails.contractEndDate}}
+              </div>
+              <div *ngIf="contractDetails.contractEndDate == null" style="margin-left: 10px; font-size: large">TBD      If the end date is null, show TBD
+              </div>
+            </div>
+            </div>
+
+            <!-- Primary Org -->
+            <div fxLayout="row">
+              <div style="margin-top: 20px">
+                <b style="font-size: large">Tier 0 Organization:</b>
+              </div>
+              <div style="margin-left: 10px; margin-top: 20px; font-size: large">{{contractDetails.primaryOrg}}</div>
+            </div>
+
+            <!-- Secondary Org -->
+            <div fxLayout="row">
+              <div style="margin-top: 20px">
+                <b style="font-size: large">Tier 1 Organization:</b>
+              </div>
+              <div style="margin-left: 10px; margin-top: 20px; font-size: large">{{contractDetails.secondaryOrg}}</div>
+            </div>
+
+            <!-- Tertiary Org -->
+            <div fxLayout="row">
+              <div style="margin-top: 20px">
+                <b style="font-size: large">Tier 2 Organization:</b>
+              </div>
+              <div style="margin-left: 10px; margin-top: 20px; font-size: large">{{contractDetails.tertiaryOrg}}</div>
+            </div>
+
+        </div>
+      </div>
+
+      </mat-card-content>
+    </mat-card>
+
+
+</ng-container>
