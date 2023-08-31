@@ -1,0 +1,24 @@
+An issue that can happen in your local environment when dealing with files uploaded to a web app is that the file location
+for uploaded files can change when re-running your debugger. You can set which file is root in the config files in intellij
+
+Make sure you have a tmp folder in your C: drive
+
+
+Step 1:
+Go to your application.yaml file
+
+Step 2:
+Look for Hadoop settings and look for root directory, in this case
+
+storage.dir:            ${hdfs.root.dir}/storage
+
+Step 3:
+In Intellij, go to Run > Edit Configurations
+Go to Spring Boot in the left navigation
+
+Step 4:
+Under VM Options add this to the config
+
+-Dhdfs.root.dir=C:/tmp
+
+--End
