@@ -1,0 +1,12 @@
+1. Go to git show history on your branch with commits. Copy the revision number of the commit just before the commit of the branch you want to copy over.
+Right Click and copy revision number and paste it into the "startingRevisionNumber", then go back to git show history
+and copy the revision number of the last commit you made and place it in endingRevisionNumber.
+
+git diff --full-index  startingRevisionNumber endingRevisionNumber > change.patch  //This copies it to a text file
+
+make your new branch from development
+
+in the terminal >> git apply --verbose change.patch
+
+Now check your local changes for the new commits from the old branch
+

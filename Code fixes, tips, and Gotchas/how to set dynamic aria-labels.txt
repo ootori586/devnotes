@@ -1,0 +1,8 @@
+When adding aria-labels to buttons and text fields, the titles and aria-labels should match. But, sometimes
+a title might have something like this title="{{this.something}}" If you try to set the aria-label the same it is incorrect
+and Angular will not be happy. Instead you have to treat aria-labels as follows
+
+[attr.aria-label]="this.something"
+
+
+
