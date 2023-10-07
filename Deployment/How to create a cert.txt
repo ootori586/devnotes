@@ -1,7 +1,7 @@
 How to Create a BDP Account
 ---------------------------
 
-dev1_frms_user_8
+frms_dev2_gov_user1
 Procedure
 ---------
  1. ssh to the puppet master

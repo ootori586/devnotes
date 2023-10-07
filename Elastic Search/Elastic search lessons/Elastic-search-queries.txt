@@ -1,0 +1,124 @@
+Things to remember:
+-- You cannot sort paragraphs (good for description fields)
+
+Bulk updates are 2-line contracts
+{ "index": { "_index": "reports7",  "_id": 1 }}                   //line one
+{ "created_date": "10/01/2023", "report_name": "report name 7", "priority": "low", "description": "he really likes o'reilly", "id":1}  //line 2
+
+Sorting:
+-By default the sorting  is by relevancy score.
+- In order to not use the default relevancy score, we have to specify in the query.
+
+
+When you create an elastic search mapping, you must destroy it before implementing new changes.
+DELETE /reports7                                                 //This is the syntax for deleting the mapping and any associated indexes
+
+      PUT /reports7                                             //This is the syntax for making the mapping
+		{
+		   "settings": {                                        // Settings, the refresh interval determines how fast you see updates to the index
+			   "refresh_interval": "1s"
+		},
+		"mappings": {                                           //mapping syntax
+
+				"dynamic": "strict",
+				    "properties": {
+
+				      "id":{
+				        "type":"integer"
+				      },
+
+				         "description": {
+				            "type": "text"
+				        },
+
+				        "priority": {
+				             "type": "text",
+				             "fields": {
+				                "raw": {
+				                   "type": "keyword"
+				               }
+				             }
+
+				        },
+				        "created_date":{
+				          "type":"date",
+				          "format": "MM/dd/yyyy||yyyy-MM-dd||epoch_millis||epoch_second",
+				          "ignore_malformed": false
+				        },
+
+				        "report_name":{
+				          "type":"text"
+				        }
+				    }
+			   }
+
+			 }
+
+
+        POST _bulk
+    { "index": { "_index": "reports7",  "_id": 1 }}
+    { "created_date": "10/01/2023", "report_name": "report name 7", "priority": "low", "description": "he really likes o'reilly", "id":1}
+    { "index": { "_index": "reports7",  "_id": 2 }}
+    { "created_date": "10/02/2023", "report_name": "The report name 10", "priority": "LOW", "description": "depending on the kind query, you might want to go different ways with it.  This is not a high priority task.","id":2}
+    { "index": { "_index": "reports7",  "_id": 3 }}
+    { "created_date":"10/03/2023", "report_name": "report name 2", "priority": "high","id":3}
+    { "index": { "_index": "reports7",  "_id": 4 }}
+    { "created_date": "10/04/2023", "report_name": "report name 1", "priority": "HIGH", "description": "This description is for record four", "id":4}
+    { "index": { "_index": "reports7",  "_id": 5 }}
+    { "created_date": "10/05/2023", "report_name": "report name 5", "priority": "low", "description": "There are too many singers from the 1980s listed here.  Get a life!!", "id":5}
+    { "index": { "_index": "reports7",  "_id": 6 }}
+    { "created_date": "12/05/2023", "report_name": "report name 27", "priority": "Medium", "description": "I need a vacation!!!", "id":6}
+    { "index": { "_index": "reports7",  "_id": 7 }}
+    { "created_date": "10/05/2023", "report_name": "report name 6", "priority": "HIGH", "description": "I want some Mexican food!", "id":7}
+    { "index": { "_index": "reports7",  "_id": 8 }}
+    { "created_date": "10/07/2023", "report_name": "report name 9", "priority": "LOW", "description": "High This record tastes like bacon!", "id":8}
+    { "index": { "_index": "reports7",  "_id": 9 }}
+    { "created_date": "10/05/2023", "report_name": "report name 44", "priority": "medium", "description": "I want to go camping!","id":9}
+    { "index": { "_index": "reports7",  "_id": 10 }}
+    { "created_date": "12/10/2023", "report_name": "report name 12", "priority": "HIGH", "description": "With great power comes great responsibility", "id":10}
+
+    POST reports7/_search
+{
+  "query": {
+    "query_string": {
+      "query": "created_date:[01/01/2023 TO now]"                  // How to query the created date from a certain day until now (today's date)
+                                                                   // [01/01/2023 TO 12/31/2023] the TO operator to search a range
+    }
+  },
+  "sort":[{"priority.raw": {"order":"asc"}}]                        // You can also sort the above query based on a field (_source) for example this
+}                                                                       sorts the priority field ordered by ascending
+
+			POST reports7/_search
+{
+  "query": {
+    "query_string": {
+      "query": "low OR Medium"
+    }
+  },
+  "sort":[{"priority.raw": {"order":"asc"}}]
+}
+
+	POST reports7/_search
+{
+  "query": {
+    "query_string": {
+      "query": "priority:high"
+    }
+  },
+  "_source":["created_date", "priority", "id", "report_name"],
+  "sort":[{"priority.raw": {"order":"asc"}}]
+}
+
+	POST reports7/_search
+{
+  "query": {
+    "query_string": {
+      "query": "the"
+    }
+  },
+  "_source":["priority", "id", "report_name", "description"]                   // When you are using the query above to search for every  field that
+  }                                                                               uses the word "the" you can also limit what fields(_source) you want to
+                                                                                  see.
+
+
+

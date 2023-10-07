@@ -1,0 +1,6 @@
+When trying to upload a file and have it display in a grid, you need to understand what is getting sent to the backend
+ and what needs to be displayed in the grid. For example,
+ after uploading a file in a pop-up dialog it needed to display the name of the file uploaded, the url (to open the document in a new page)
+ and a time stamp of the time uploaded.
+
+
