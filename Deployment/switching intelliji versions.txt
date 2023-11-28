@@ -1,0 +1,14 @@
+For Melanie A, the workaround for getting the cvf and nccs projects to work in intellij:
+ 1) Open terminal in adminsitrator mode
+     nvm use 12.5.0
+
+ 2) Open NCCS or FRMS project
+     -- Debugger works    (when intellij is configured to use node in the c:\program files\nodejs  shortcut created by the nvm use command)
+
+ 3) Close intellij
+
+ 4) Open terminal in administrator mode
+     nvm use 18.17.0
+
+ 5) Open CVF project
+     - Debugger works    (when intellij is configured to use node in the c:\program files\nodejs  shortcut created by the nvm use
