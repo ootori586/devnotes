@@ -1,0 +1,5 @@
+add to columnDef of column display you want changed
+
+valueFormatter: function (params: any) {
+  return formatDate(new Date(params.value), 'MM/dd/yyyy', 'en-US');
+},

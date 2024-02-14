@@ -1,0 +1,16 @@
+  public release() {
+    this.claimOrUnclaimInProgress = true;
+    setTimeout(() => {                                  arrow function is needed if you have more than one function being called
+      this.contractService.release(this.params.data.contractId).subscribe(() => {
+
+        //@ts-ignore
+        this.params.refresh();
+      });
+    },5000);
+  }
+
+  You can also use .pipe(delay(4000)) on a frontend service method
+
+// Return an observable that will hold a list of Dto objects
+    return this.httpClient.get <Dto[]>(restUrl).pipe(delay(4000))
+  }

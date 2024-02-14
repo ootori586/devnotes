@@ -1,0 +1,10 @@
+public clearAllExceptionNotifications() {
+    this.notificationService.clearAllExceptionNotifications().subscribe(()=>{
+
+      this.applyFilterReloadGrid(this.selectedFilter);
+    });
+
+  }
+
+  use the .subscribe(next:():void=>{ other method goes here  }) when the subscribing method needs to act after the method inside the body comes back from
+  getting data from the rest end point.

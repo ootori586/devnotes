@@ -1,0 +1,8 @@
+Sometimes you need extra vertical space between form fields to make room for mat errors,
+so that they don't run into the form field below it. This is how you do it
+
+in the .css file
+
+mat-form-field {
+  margin: 4px 0;
+}

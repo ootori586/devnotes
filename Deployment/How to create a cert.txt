@@ -30,6 +30,7 @@ Procedure
  7. Transfer the p12 file from the puppet master /tmp directory to your computer (open in cmd prompt)
     NOTE:  This assumes that the puppet master has an IP address of 10.1.21.100 or 10.1.23.100
     unix> scp manderson@10.1.24.100:/tmp/*.p12 .    # The dot means to copy the file to the current directory
+    unix> scp manderson@10.1.25.100:/tmp/*.p12 .    # The dot means to copy the file to the current directory
 
 
 

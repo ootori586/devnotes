@@ -1,0 +1,13 @@
+// Loop through *EVERY* item in this array. You cannot use break statements with these, they will not work.
+
+aData.forEach(dto:blahBlahBlahDto of aData) :void =>{
+NOT A FOR LOOP
+}
+
+
+// Loop through *EVERY* item in this array. Break will work
+for (let dto: blahBlahBlahDto of aData) {
+
+//This is a for loop and break will work
+
+}
