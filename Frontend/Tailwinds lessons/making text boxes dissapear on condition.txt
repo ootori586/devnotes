@@ -1,0 +1,214 @@
+<div class="m-2.5">
+<!--  top of page-->
+  <div class="flex flex-row m-2.5">
+
+    <div class="w-1/2">
+        Stock Trade
+    </div>
+
+    <div class="w-1/2 flex place-content-end">
+      <button type="button" rbr-outline-button title="Help" aria-label="Help">
+        Help
+      </button>
+
+     </div>
+
+  </div>
+
+  <div class="grid grid-cols-3 gap-2.5 m-2.5">
+
+    <div>
+      <mat-form-field subscriptSizing="dynamic" class="max-reduced-density">
+        <mat-label> Action </mat-label>
+        <mat-select title="Action" aria-label="Action">
+          <mat-option [value]="1"> Buy Stock </mat-option>
+          <mat-option [value]="2"> Buy Mutual Fund </mat-option>
+          <mat-option [value]="3"> Sell Stock </mat-option>
+          <mat-option [value]="4"> Sell Mutual Fund </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+    <div>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label> Quantity </mat-label>
+        <input matInput type="text" title="Quantity" aria-label="Quantity">
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label> Symbol </mat-label>
+        <input matInput type="text" title="Symbol" aria-label="Symbol">
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field subscriptSizing="dynamic" class="max-reduced-density">
+        <mat-label> Order Type </mat-label>
+        <mat-select #actionDropdown title="Order Type" aria-label="Order Type">  ************* template variable **********
+          <mat-option [value]="1"> Market Order </mat-option>
+          <mat-option [value]="2"> Limit Order </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div *ngIf="actionDropdown.value == 2" class="col-span-2">  *********** add an ngIf* ****************
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label> Limit Price </mat-label>
+        <input matInput type="text" title="Limit Price" aria-label="Limit Price">
+      </mat-form-field>
+    </div>
+
+  </div>
+
+<!--  bottom row-->
+  <div class="flex flex-row gap-2.5 m-2.5 place-content-center">
+
+    <div>
+      <button type="button" rbr-outline-button title="Reset" aria-label="Reset">
+        Reset
+      </button>
+    </div>
+
+    <div>
+      <button type="button" rbr-solid-button title="Review Order" aria-label="Review Order">
+        Review Order
+      </button>
+    </div>
+
+    <div>
+      Save for later
+    </div>
+
+  </div>
+
+</div>
+
+
+************************************************************************* Two way binding *************************************************************************
+Add variable to .ts file
+ public orderType: number;
+
+.html
+<div class="m-2.5">
+<!--  top of page-->
+  <div class="flex flex-row m-2.5">
+
+    <div class="w-1/2">
+        Stock Trade
+    </div>
+
+    <div class="w-1/2 flex place-content-end">
+      <button type="button" rbr-outline-button title="Help" aria-label="Help">
+        Help
+      </button>
+
+     </div>
+
+  </div>
+
+  <div class="grid grid-cols-3 gap-2.5 m-2.5">
+
+    <div>
+      <mat-form-field subscriptSizing="dynamic" class="max-reduced-density">
+        <mat-label> Action </mat-label>
+        <mat-select title="Action" aria-label="Action">
+          <mat-option [value]="1"> Buy Stock </mat-option>
+          <mat-option [value]="2"> Buy Mutual Fund </mat-option>
+          <mat-option [value]="3"> Sell Stock </mat-option>
+          <mat-option [value]="4"> Sell Mutual Fund </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+    <div>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label> Quantity </mat-label>
+        <input matInput type="text" title="Quantity" aria-label="Quantity">
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label> Symbol </mat-label>
+        <input matInput type="text" title="Symbol" aria-label="Symbol">
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field subscriptSizing="dynamic" class="max-reduced-density">
+        <mat-label> Order Type </mat-label>
+        <mat-select [(ngModel)]="this.orderType" title="Order Type" aria-label="Order Type"> ************** ngModel is used
+          <mat-option [value]="1"> Market Order </mat-option>
+          <mat-option [value]="2"> Limit Order </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div *ngIf="this.orderType == 2" class="col-span-2"> ************************** use *ngIf
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label> Limit Price </mat-label>
+        <input matInput type="text" title="Limit Price" aria-label="Limit Price">
+      </mat-form-field>
+    </div>
+
+  </div>
+
+<!--  bottom row-->
+  <div class="flex flex-row gap-2.5 m-2.5 place-content-center">
+
+    <div>
+      <button type="button" rbr-outline-button title="Reset" aria-label="Reset">
+        Reset
+      </button>
+    </div>
+
+    <div>
+      <button type="button" rbr-solid-button title="Review Order" aria-label="Review Order">
+        Review Order
+      </button>
+    </div>
+
+    <div>
+      Save for later
+    </div>
+
+  </div>
+
+</div>
+
+
+***************************************************This is a reactive form************************************
+used when we have more than 3 forms
+
+.ts file
+
+public myForm: FormGroup;    ******************* add myForm variable
+
+  constructor(private formBuilder: FormBuilder) {  ************************** inject FormBuilder service to constructor
+  }
+
+  public ngOnInit(): void {                   ********************** add form controls to ngOnInit()
+
+    // Initialize the myForm object
+    this.myForm = this.formBuilder.group({
+      actionType:  [null, null],
+      limitPrice:  [null, null],
+      quantity:    [null, null],
+      symbol:      [null, null],
+      orderType:   [null, null]
+
+    });
+
+
+    .html
+    wrap form tag around code
+    <form [formGroup]="this.myForm" novalidate autocomplete="off">
+    </form>
+
+    add formControlName="actionType" (etc...) inside input tags and mat select tags
+
+

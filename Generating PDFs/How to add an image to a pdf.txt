@@ -1,0 +1,54 @@
+For this example, I want to add a fixed image to a coverpage and then a different image that populates everytime a new page is added
+in the pdf.
+
+You must first create a blank page with the graphic placement and save it as a pdf and save it to a folder in intellij
+in this case, you will have two different pdf graphic files.
+
+
+In the PDFDocument Creator class add some global variables to hold and load the pdf files with the graphics you created.
+
+private PDDocument coverPageTemplate;
+private PDDocument genericPageTemplate;
+
+InputStream templateInputStream = Application.class.getResourceAsStream("/pdf-template/graphic_one_coverpage.pdf");
+
+        this.coverPageTemplate = PDDocument.load(templateInputStream);
+
+        templateInputStream.close();
+
+        InputStream templateInputStream2 = Application.class.getResourceAsStream("/pdf-template/graphic_for_other_pages.pdf");
+
+        this.genericPageTemplate = PDDocument.load(templateInputStream2);
+
+        templateInputStream2.close();
+
+
+Create a void method in the PDFDocumentCreator class called createFirstPage() add the method to your constructor in the PDFCreator class
+that extends the PDFDocumentCreator class. These methods will use your global variables and import the page when this method is called.
+
+ protected void createFirstPage() throws Exception {
+
+        this.doc.importPage(this.coverPageTemplate.getPage(0));   the importPage() method gets the pdf page with you image you created with the index of the first(and only page) in the document
+
+        this.currentPage = this.doc.getPage(this.doc.getNumberOfPages()-1);
+        this.yLocation = this.currentPage.getMediaBox().getHeight() - TOP_MARGIN;
+
+        addPageDefaults();
+
+    }
+
+
+There is a method in the PDFDocumentCreator class called createNewPage(), this gets called when a new page needs to be created, for example,
+there are methods that let text wrap around to the next page when the page runs out of room. This method gets called.
+It gets the re-occurring graphic that you saved.
+
+protected void createNewPage() throws Exception {
+
+        this.doc.importPage(this.genericPageTemplate.getPage(0));
+
+        this.currentPage = this.doc.getPage(this.doc.getNumberOfPages()-1);
+        this.yLocation = this.currentPage.getMediaBox().getHeight() - TOP_MARGIN;
+
+        addPageDefaults();
+
+    }

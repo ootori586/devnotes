@@ -1,0 +1,215 @@
+Lesson 6 / Actual Height vs Visible Height
+-------------------------------------------
+
+
+  WHAT HAPPENS when the Actual Height > Visible Height?
+
+	Possibility #1: The extra text get cut off  (no scrollbar)                                         style="overflow-y: hidden"           class="overflow-y-hidden"
+	Possibility #2:	The extra text is displayed and bleeds over the surrounding div  (default)         style="overflow-y: initial"
+	Possibility #3: Vertical scrollbar appears (if needed)                                             style="overflow-y: auto"             class="overflow-y-auto"
+	Possibility #4: Vertical scrollbar appears (all of the time)                                       style="overflow-y: scroll"           class="overflow-y-scroll"
+
+
+
+
+
+Exercise 6a / Create this page
+------------------------------
+
+ 1. Create a new page:  Call it Layout6
+
+ 2. Setup the layout at such:
+
+            +----------------------------------------------------------------------------+
+            | Layouts 6                                                       <Info Btn> |
+            +----------------------------------------------------------------------------+
+            |                                                                            |
+            |   +------------------------+                                               |
+            |   |  div 1                 |                                               |
+            |   |           line 1       |                                               |
+            |   |           line 2       |                                               |
+            |   |           line 3       |                                               |
+            |   |           line 4       |                                               |
+            |   +------------------------+                                               |
+            |                                                                            |
+            |                                                                            |
+            +----------------------------------------------------------------------------+
+
+			div1 has a height of 100px
+			div1 has a width  of 300px
+
+	3. Fill the div with 10 lines (so it has more text than can be displayed)
+
+			<div class="block">line 1</div>
+			<div class="block">line 2</div>
+			<div class="block">line 3</div>
+			<div class="block">line 4</div>
+			<div class="block">line 5</div>
+			<div class="block">line 6</div>
+			<div class="block">line 7</div>
+			<div class="block">line 8</div>
+			<div class="block">line 9</div>
+			<div class="block">line 10</div>
+
+
+
+
+	WHAT HAPPENS WHEN THE ACTUAL HEIGHT > VISIBLE HEIGHT?
+
+
+
+<div class="flex flex-row m-2.5">
+
+  <div class="w-1/2"> Layout 6 </div>
+  <div class="w-1/2 flex place-content-end"> Info Btn </div>
+
+</div>
+
+<div>
+  <div class="w-[300px] h-[100px] overflow-y-scroll">
+
+    <div class="block"> line 1 </div>
+    <div class="block"> line 2 </div>
+    <div class="block"> line 3 </div>
+    <div class="block"> line 4 </div>
+    <div class="block"> line 5 </div>
+    <div class="block"> line 6 </div>
+    <div class="block"> line 7 </div>
+    <div class="block"> line 8 </div>
+    <div class="block"> line 9 </div>
+    <div class="block"> line 10 </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Exercise 6b / Create a page with 2 boxes
+---------------------------------------------
+ 1. Add a new page called "Layout 6b" page so that it shows this:
+
+
+ 2. Setup the layout as so
+
+            +----------------------------------------------------------------------------+
+            | Layouts 6b (fixed height)                            <Help Btn> <Info Btn> |                                               |
+            +----------------------------------------------------------------------------+
+            |                                                                            |     // This empty row has a height of 10px
+            +----------------------------------------------------------------------------+
+            |                                                                            |
+            | +----------------------------+          +----------------------------+     |     // Each box is a fixed height of 300px
+            | | Box 1                      |          |  Box 2                     |     |
+            | |                            |          |                            |     |
+            | | This is box 1              |          |  This is box 2             |     |
+            | +----------------------------+          +----------------------------+     |
+            |           50% of width          20px          50% of width                 |
+            |                                                                            |
+            +----------------------------------------------------------------------------+
+
+
+
+
+
+<div class="flex flex-row">
+  <div class="w-[500px]"> Layout 6b </div>
+  <div class="w-[250px] flex place-content-end"> Help Btn </div>
+  <div class="w-[250px] flex place-content-end"> Info Btn </div>
+</div>
+<div class="h-2.5"></div>
+
+<div class="grid grid-cols-2 gap-[20px]">
+  <div class="h-[300px]"> This is card 1</div>
+  <div class="h-[300px]"> This is card 2</div>
+</div>
+
+
+
+Exercise 6c / Create a page with 2 boxes / variable height
+----------------------------------------------------------
+ 1. Add a new page called "Layout 6c" page so that it shows this:
+
+
+ 2. Setup the layout as so
+
+            +----------------------------------------------------------------------------+
+            | Layouts 6c (variable height)                         <Help Btn> <Info Btn> |
+            +----------------------------------------------------------------------------+
+            |                                                                            |     // This empty row has a height of 10px
+            +----------------------------------------------------------------------------+
+            |                                                                            |
+            | +----------------------------+        +----------------------------+       |     // Each box uses the *REMAINING* height of the page
+            | | Box 1                      |        |  Box 2                     |       |
+            | |                            |        |                            |       |
+            | |                            |        |                            |       |
+            | |                            |        |                            |       |      style="height: calc(100vh -  150px)"    class="overflow-y-auto"
+            | |                            |        |                            |       |
+            | |                            |        |                            |       |
+            | |                            |        |                            |       |
+            | |                            |        |                            |       |
+            | |                            |        |                            |       |
+            | |                            |        |                            |       |
+            | |                            |        |                            |       |
+            | | This is box 1              |        |  This is box 2             |       |
+            | +----------------------------+        +----------------------------+       |
+            |           50% of width          20px          50% of width                 |
+            |                                                                            |
+            +----------------------------------------------------------------------------+
+
+
+<div class="flex flex-row">
+  <div class="w-[500px]"> Layout 6b </div>
+  <div class="w-[250px] flex place-content-end"> Help Btn </div>
+  <div class="w-[250px] flex place-content-end"> Info Btn </div>
+</div>
+<div class="h-2.5"></div>
+<div style="height: calc(100vh - 150px)" class="overflow-y-auto">
+ <div class="grid grid-cols-2 gap-[20px]">
+  <div class="h-[300px]"> This is card 1</div>
+  <div class="h-[300px]"> This is card 2</div>
+ </div>
+</div>
+
+
+
+Exercise 6d / Create Page using the Holy Grail Layout
+-----------------------------------------------------
+ 1. Add a new page called "Holy Grail Layout" page so that it shows this:
+
+ 2. Setup the layout as so:
+
+            +----------------------------------------------------------------------------+
+            | Holy Grail Layout                                               <Help Btn> |       This part always has a height of 100px
+            |                                                                            |
+            +----------------------------------------------------------------------------+
+            |  Left side of page                  |  Right side of page                  |
+            |                                     |                                      |
+            |                                     |                                      |
+            |                                     |                                      |      This part uses the *REMAINING* height of the page
+            |                                     |                                      |
+            |                                     |                                      |
+            |                                     |                                      |
+            |                                     |                                      |
+            |                                     |                                      |
+            |                                     |                                      |
+            |                                     |                                      |
+            |                                     |                                      |
+            |               50%                   |           50%                        |
+            +----------------------------------------------------------------------------+
+            |             Status Line is Centered Horizontally and Vertically            |      This part always has a height of 50px / this part hugs the bottom
+            +----------------------------------------------------------------------------+
+
+
+
+
+

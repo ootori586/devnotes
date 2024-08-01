@@ -1,0 +1,22 @@
+In this example, we are going to show how to display dynamic and static data in a pdf preview/layout
+
+We have 3 levels of priorities that can have various different sorts of data depending on the level.
+
+We need to make a method that gets all the static info (name of company, their address, phone number for example)
+We need to make another method (will be a List method, because we can have a list of dtos depending on how many chunks of data are in a level ) that gets all the dynamic data (this method will get called from the static info method)
+
+
+
+        List<DetailsDTO> priorityOneAlerts = getAllAlertsForCaseAndReferralLevel(aCaseId, Constants.REFERRAL_LEVEL_ONE_ID);
+
+		List<AlertDetailsDTO> priorityTwoAlerts = getAllAlertsForCaseAndReferralLevel(aCaseId, Constants.REFERRAL_LEVEL_TWO_ID);
+
+		List<AlertDetailsDTO> priorityThreeAlerts = getAllAlertsForCaseAndReferralLevel(aCaseId, Constants.REFERRAL_LEVEL_THREE_ID);
+
+        dto.setReferralLevelOneAlerts(referralOneAlerts);
+
+		dto.setReferralLevelTwoAlerts(referralTwoAlerts);
+
+		dto.setReferralLevelThreeAlerts(referralThreeAlerts);
+
+        return dto;

@@ -90,7 +90,21 @@ Exercise 3c / Make the grid responsive grid with 3 columns
             <div class="grid grid-cols-3">
 
 
+<div class="grid grid-cols-1 min-[768px]:grid-cols-2   min-[1025px]:grid-cols-3 ">
 
+	<div>
+		Col 1
+	</div>
+
+	<div>
+		Col 2
+	</div>
+
+	<div>
+		Col 3
+	</div>
+
+</div>
 
 
 
@@ -152,6 +166,64 @@ Make this 3-column grid responsive so it follows these rules:
     If the user's screen is 1 - 899px,      then show 1 column
     If the user's screen is 900 - 1200px,   then show 2 columns
     If the user's screen is 1201 or more,   then show 3 columns
+
+
+    	<div class="flex flex-row">
+
+    		<div class="w-1/2 ml-2.5 self-center">
+    		<span class="text-xl"> All Reports </span>
+    		</div>
+
+    		<div class="w-1/2 flex place-content-end p-2.5">
+    			<button type="button" rbr-outline-button title="Help" aria-label="Help">
+    				Go to Reports
+    			</button>
+
+    		</div>
+
+    	</div>
+
+
+    	<div class="grid grid-cols-1 min-[900px]:grid-cols-2 min-[1201px]:grid-cols-3 m-2.5 gap-5">
+
+    		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+    			Burndown Chart
+    		</div>
+
+    		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+    			Burnup Chart
+    		</div>
+
+    		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+    			Sprint Report
+    		</div>
+
+    		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+    			Velocity Report
+    		</div>
+
+    		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+    			Epic Report
+    		</div>
+
+    		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+    			Version Report
+    		</div>
+
+    		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+    			Control Chart
+    		</div>
+
+    		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+    			Time Tracking Report
+    		</div>
+
+    		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+    			Version Workload Report
+    		</div>
+
+    	</div>
+
 
 
 
@@ -220,6 +292,62 @@ Change it so it fills-in the WIDTH of the BROWSER.
         The page shows 3 columns because your browser stops here.......^
 
 
+	<div class="flex flex-row">
+
+		<div class="w-1/2 ml-2.5 self-center">
+		<span class="text-xl"> All Reports </span>
+		</div>
+
+		<div class="w-1/2 flex place-content-end p-2.5">
+			<button type="button" rbr-outline-button title="Help" aria-label="Help">
+				Go to Reports
+			</button>
+
+		</div>
+
+	</div>
+
+
+	<div class="flex flex-row flex-wrap m-2.5 gap-5">            *************************** flex wrap *************************************
+
+		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+			Burndown Chart
+		</div>
+
+		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+			Burnup Chart
+		</div>
+
+		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+			Sprint Report
+		</div>
+
+		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+			Velocity Report
+		</div>
+
+		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+			Epic Report
+		</div>
+
+		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+			Version Report
+		</div>
+
+		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+			Control Chart
+		</div>
+
+		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+			Time Tracking Report
+		</div>
+
+		<div class="w-[300px] h-[100px] p-2.5 mat-elevation-z4 flex items-center justify-center">
+			Version Workload Report
+		</div>
+
+	</div>
+
 
 
 
@@ -233,6 +361,15 @@ Exercise 3h / Add images
 
 
 
+	<div class="flex flex-row flex-wrap m-2.5 gap-5">
+
+		<div class="w-[500px] h-[200px] p-2.5 mat-elevation-z4">
+			<img class="border border-black object-fill w-full h-full"  src="./assets/images/burndown.chart.png" alt="Burndown Chart" title="Burndown Chart">
+			<div class="flex justify-center" >
+				Burndown Chart
+			</div>
+
+		</div>
 
 
 Exercise 3i / Make a full page version of the "Burndown Chart"

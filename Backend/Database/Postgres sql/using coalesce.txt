@@ -1,0 +1,9 @@
+
+When using the code below, this is being used for data being displayed on the front end by being pulled from a
+column in a table.
+In this example, a document has a null section id unlike some other documents being uploaded in the webapp. Using
+coalesce, it looks at the first parameter and ignores it if there is a value, but if there is a null value, it will
+add the value in the single quotes to the variable sectionName to return to the frontend.
+
+coalesce(s.name, 'Documents') as sectionName
+coalesce(s.name, 'Documents') as sectionName
