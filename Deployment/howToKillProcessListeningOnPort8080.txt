@@ -10,7 +10,7 @@ Procedure
 
  2. Find the process id that is listening on port 8080
     CMD> cd c:\windows\system32
-    CMD> netstat -ano | find "8080"
+    CMD> netstat -ano | find "4200"
 
     -- You should see the process id -- e.g., 12345
 

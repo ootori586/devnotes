@@ -6,17 +6,136 @@ We need to make a method that gets all the static info (name of company, their a
 We need to make another method (will be a List method, because we can have a list of dtos depending on how many chunks of data are in a level ) that gets all the dynamic data (this method will get called from the static info method)
 
 
+Make priority id of all 3 priorities a constant in backend
 
-        List<DetailsDTO> priorityOneAlerts = getAllAlertsForCaseAndReferralLevel(aCaseId, Constants.REFERRAL_LEVEL_ONE_ID);
 
-		List<AlertDetailsDTO> priorityTwoAlerts = getAllAlertsForCaseAndReferralLevel(aCaseId, Constants.REFERRAL_LEVEL_TWO_ID);
+        List<AlertDetailsDTO> priorityOneAlerts = getAllAlertsForCaseAndLevel(aCaseId, Constants.PRIORITY_ONE_ID);
 
-		List<AlertDetailsDTO> priorityThreeAlerts = getAllAlertsForCaseAndReferralLevel(aCaseId, Constants.REFERRAL_LEVEL_THREE_ID);
+		List<AlertDetailsDTO> priorityTwoAlerts = getAllAlertsForCaseAndLevel(aCaseId, Constants.PRIORITY_TWO_ID);
 
-        dto.setReferralLevelOneAlerts(referralOneAlerts);
+		List<AlertDetailsDTO> priorityThreeAlerts = getAllAlertsForCaseAndLevel(aCaseId, Constants.PRIORITY_THREE_ID);
 
-		dto.setReferralLevelTwoAlerts(referralTwoAlerts);
+        dto.setLevelOneAlerts(levelOneAlerts);
 
-		dto.setReferralLevelThreeAlerts(referralThreeAlerts);
+		dto.setLevelTwoAlerts(levelTwoAlerts);
+
+		dto.setLevelThreeAlerts(levelThreeAlerts);
 
         return dto;
+
+
+ Make a method that gets called from the static data method that passes in the caseId and priorityId and sends back a list of dtos of the dynamic data
+private List<AlertDetailsDTO> getAllAlertsForCaseAndLevel(Integer aCaseId, int aPriortyLevelId) {
+
+		JdbcTemplate jt = new JdbcTemplate(this.dataSource);
+
+		String alertSql = """
+		Some Sql here
+		""";
+
+		BeanPropertyRowMapper<AlertDetailsDTO> alertRowMapper = new BeanPropertyRowMapper<>(AlertDetailsDTO.class);
+
+		List <AlertDetailsDTO> alertDtos = jt.query(alertSql, alertRowMapper, aCaseId, aPriortyLevelId);
+
+
+		return alertDtos;
+	}
+
+	In the static data method's DTO add/get the List of dtos
+	List<AlertDetailsDTO> LevelOneAlerts = new ArrayList<>();
+
+    List<AlertDetailsDTO> LevelTwoAlerts = new ArrayList<>();
+
+    List<AlertDetailsDTO> LevelThreeAlerts = new ArrayList<>();
+
+
+
+    In the Java class where you are creating the pdf layout, create 3 conditional statements
+
+    if (staticDataDTO.getLevelOneAlerts().size() > 0) {             ***** if the list of priority 1 dtos is greater than 0 than do the following
+                // I have level 1 alerts so add them to the pdf.
+                String referralOneLabel = "Priority 1 Alerts";      ****** Add this string to display once
+
+                // No new lines here, if you add \n to the referral header text then the pdfBox blows up
+                String OneHeader = "Static string";                 ********* Add this header to display once
+                addAlertsToPdf(priorityOneLabel, priorityOneHeader, alertSectionHeight, staticDataDTO.getLevelOneAlerts()); *****Call this method that will get the dynamic data and display it
+            }
+
+            if (staticDataDTO.getLevelTwoAlerts().size() > 0) {
+                // I have level 2 alerts so add them to the pdf.
+                String priorityTwoLabel = "Priority 2 Alerts";
+
+                // No new lines here, if you add \n to the referral header text then the pdfBox blows up
+                String TwoHeader = "Static String";
+                addAlertsToPdf(rpriorityTwoLabel, priorityTwoHeader, alertSectionHeight, staticDataDTO.getLevelTwoAlerts());
+            }
+
+            if (staticDataDTO.getReferralLevelThreeAlerts().size() > 0) {
+                // I have referral level 3 alerts so add them to the pdf.
+                String priorityThreeLabel = "Priority 3 Alerts";
+
+                // No new lines here, if you add \n to the referral header text then the pdfBox blows up
+                String ThreeHeader = "static string";
+                addAlertsToPdf(priorityThreeLabel, ThreeHeader, alertSectionHeight, staticDataDTO.getLevelThreeAlerts());
+            }
+
+
+
+           * Dynamic method that gets called in the conditional statement body *
+
+            private void addAlertsToPdf(String aPriorityLabel, String aPriorityHeaderText, float aSectionHeight, List<AlertDetailsDTO> aLevelAlerts) throws Exception {
+
+                    final int totalAlerts = aPriorityLevelAlerts.size();
+                    int i = 1;
+
+                    // Add the priority level and priority text to pdf
+
+
+                    autoWrapTextAcrossPages(this.getBoldFont(), 10, 34, 525, 12, aPriorityLabel);
+                    autoWrapTextAcrossPages(this.getPlainFont(), 10, 34, 525, 12, aPriorityHeaderText);
+
+
+                    List<PDFTextStringSegment> alertsList = new ArrayList<>();
+                    alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+
+                    for (AlertDetailsDTO alertDetailsDTO: aPriorityLevelAlerts) {
+                        String alertMessageCount = String.format("Alert # %d of %d", i, totalAlerts);
+
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment(alertMessageCount, this.getBoldFont()));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment(" label: ", this.getPlainFont()));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment(alertDetailsDTO.getData() + "\n", this.getBoldFont()));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment(alertDetailsDTO.getData() + "\n", this.getBoldFont()));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment(alertDetailsDTO.getData() + "\n", this.getBoldItalicFont()));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment(alertDetailsDTO.getData() + "\n", this.getPlainFont()));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment(" label: ", this.getPlainFont()));
+                        alertsList.add(new PDFTextStringSegment(alertDetailsDTO.getData() + "\n", this.getBoldFont()));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment(" label: ", this.getPlainFont()));
+                        alertsList.add(new PDFTextStringSegment(alertDetailsDTO.getData() + "\n", this.getBoldFont()));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment(" label: ", this.getPlainFont()));
+                        alertsList.add(new PDFTextStringSegment(alertDetailsDTO.getData() + "\n", this.getBoldFont()));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment(" label: ", this.getPlainFont()));
+                        alertsList.add(new PDFTextStringSegment(alertDetailsDTO.getData() + "\n", this.getBoldFont()));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        alertsList.add(new PDFTextStringSegment("\n", this.getBoldFont(), FONT_SIZE_ELEVEN));
+                        i++;
+
+
+                    }
+
+                    autoWrapTextAcrossPages(USER_INPUT_TEXT_SIZE, 34, 525, 12, aSectionHeight, alertsList);
+                }
