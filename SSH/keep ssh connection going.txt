@@ -1,0 +1,2 @@
+right click and use Git bash in ssh folder
+top -d 30    to keep your SSH connection going

@@ -1,7 +1,7 @@
 Making a dialog box
 
 Step 1: You must first make a new component.
-    --ng g c *destination folder*/*nameOfComponent*
+    --ng g c *destination folder*/*nameOComponent*
 
 Step 2: In the components HTML, this is an example of the code that you would find for
         a dialog box

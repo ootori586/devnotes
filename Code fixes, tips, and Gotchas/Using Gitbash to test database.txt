@@ -1,0 +1,27 @@
+1. Right click on folder you want to export files to and select GitBash.
+
+2. to connect to postgres database enter this prompt:
+
+3. psql -U database_user_name -d name_of_database
+
+4. enter password:
+
+If you want to export a csv file of data from a database locally to test:
+
+5. create a sql script using the following syntax:
+   \Copy (**sql query goes here) TO '/tmp/exported_data.csv' WITH CSV HEADER;
+
+   ***NOTE: psql does not recognize multiline sql script, so the sql script must
+            be on one line or will cause syntax errors***
+
+6. Save it to tmp folder that can be accessed by GitBash.
+
+7. to run the export to test, type into prompt:
+\i export.sql (name of sql file you created in step 5.
+
+8. Check the tmp file folder for the csv and open it in excel.
+
+
+
+*****NOTE: In Gitbash enter pwd into prompt in order to find out what directory you are in, but make sure you are not in psql yet****
+

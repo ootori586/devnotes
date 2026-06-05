@@ -1,0 +1,298 @@
+How to Install Oracle 19c for Windows / Create an Oracle Account / Connect to it
+--------------------------------------------------------------------------------
+Problem:  How do I install Oracle 19c from scratch, create an oracle account, and connect to it (to build some tables and add rows)....?
+
+
+
+Part 1: Download & Unzip the massive zip file
+---------------------------------------------
+ 1. Download Oracle 19c using this url:
+    https://www.oracle.com/database/technologies/oracle19c-windows-downloads.html
+
+ 2. Enter your oracle user/password (or create one)
+
+ 3. Download the WINDOWS.X64_193000_db_home.zip  file to your Downloads/ directory
+    NOTE:  It's 3 GB in size
+
+ 4. Unzip the file to your c:\tools\oracle
+    a. Right-click on WINDOWS.X64_193000_db_home.zip -> Extract Alll...
+       Extract to:   c:\tools\oracle_home
+
+
+
+Part 2:  Run the Installer   (Fast Operation)
+---------------------------------------------
+ 1. Run the setup.exe
+    Double-click on c:\tools\oracle_home\setup.exe
+
+ 2. In the installer / Select Configuration Option
+    Choose "Setup software only"
+
+ 3. In the installer / Database Installation Option
+    Choose "Single instance database installation"
+
+ 4. In the installer / Database Edition
+    Choose "Enterprise Edition"
+
+ 5. In the installer / Oracle Home User
+    Choose "Use Virtual Account"
+
+ 6. In the installer / Installation Location
+    Enter:  c:\tools\oracle_install
+
+    NOTE:  DO NOT USE c:\tools\oracle_home !!!!!
+           This is different from the ORACLE_HOME
+
+
+ 7. Press "Install"
+
+	W A I T    A B O U T    1    M I N U T E
+
+    You should see "The registration of Oracle Database was successful"
+
+ 8. Press "Close" to close it out
+
+
+	At this point you have:
+		Your ORACLE_HOME  is c:\tools\oracle_home
+		Your installation is c:\tools\oracle_install
+
+
+
+Part 3:  Use DBCA to Create a database called "mypdb"   (Takes 30 minutes)
+--------------------------------------------------------------------------
+ 1. Run the dbca.bat script as *ADMINISTRATOR*
+    a. Go to c:\tools\oracle_home\bin\
+	b. Right-click on dbca.bat -> Run as Administrator
+
+ 2. In the DBCA / Database Operation
+    Choose "Create a database"
+
+ 3. In the DBCA / Creation Mode
+    Choose "Typical Configuration"
+       Global database name:             orcl.mshome.net
+       Storage Type:                     File System
+	   Set the administrative password:  secret
+	   Confirm the password:             secret
+	   Check "Create as Container database"
+	   Pluggable Database Name:          mypdb
+
+ 4. You will get a warning saying the "ADMIN" password does not conform to the Oracle recommended details
+    Press "Yes"
+
+ 5. Press "Finish"
+
+	W A I T    A B O U T    2 0    M I N U T E S
+
+ 6. Press "Close"
+    NOTE:  All database passwords except SYS and SYSTEM are locked
+
+
+
+
+Part 4:  Use NETCA to create a tnsnames.ora
+-------------------------------------------
+ 1. Run the netca.bat script as *ADMINISTRATOR*
+    a. Go to c:\tools\oracle_home\bin\
+	b. Right-click on netca.bat -> Run as Administrator
+
+ 2. In the NETCA / Select "Listener Configuration"
+
+ 3. In the NETCA / Select "Add"
+
+ 4. In the NETCA / Set the listener name
+    Use the defaults:   Set the name to LISTENER
+
+ 5. In the NETCA / Protocols
+    Use the defaults:   Selected Protocols holds only TCP
+
+ 6. In the NETCA / Port
+    Use the defaults:   Use the standard port of 1521
+
+ 7. In the NETCA / Connect to another listener
+    Select No
+
+	NOTE:  Look in the terminal to see the progress
+
+ 8. In the NETCA / it should say "Listener configuration complete"
+    Press "Next"
+	Press "Finish"
+
+    -- YOu should now have a tnsnames.ora in the c:\tools\oracle_home\network\admin
+
+
+
+
+Part 5:  Use NETCA to add a local net service name configuration
+----------------------------------------------------------------
+ 1. Run the netca.bat script as *ADMINISTRATOR*
+    a. Go to c:\tools\oracle_home\bin\
+	b. Right-click on netca.bat -> Run as Administrator
+
+ 2. In the NETCA / Select "Local Net Service Name configuration"
+
+ 3. In the NETCA / Select "Add"
+
+ 4. In the NETCA / Set the listener name
+    Set the name to LISTENER
+
+ 5. In the NETCA / Protocols
+    Select TCP
+
+ 6. In the NETCA / Hostname
+    Host name:     localhost
+    Choose         "Use the standard port number of 1521"
+
+ 7. In the NETCA / Would you like to test it?
+    Select No, do not test
+
+ 8. In the NETCA / service name
+    Net Service Name:  LISTENER
+
+ 9. In the NETCA / Would you like to configure another net service name?
+    Choose No
+
+ 8. In the NETCA / it should say "Listener configuration complete"
+    Press "Next"
+	Press "Finish"
+
+ 9. Get the service name
+    a. open a terminal
+	   TERMINAL> lsnrctl status
+
+	b. Look for the listener that has the name "mypdb" in it
+       -- This is your service name:   "mypdb.mshome.net"
+
+
+			Alias                     LISTENER
+			Version                   TNSLSNR for 64-bit Windows: Version 19.0.0.0.0 - Production
+			Start Date                28-OCT-2024 21:16:51
+			Uptime                    0 days 1 hr. 33 min. 28 sec
+			Trace Level               off
+			Security                  ON: Local OS Authentication
+			SNMP                      OFF
+			Listener Parameter File   C:\Users\Tricia\Downloads\WINDOWS.X64_193000_db_home\network\admin\listener.ora
+			Listener Log File         c:\tools\oracle\diag\tnslsnr\DESKTOP-4KHMS17\listener\alert\log.xml
+			Listening Endpoints Summary...
+			  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=DESKTOP-4KHMS17)(PORT=1521)))
+			  (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(PIPENAME=\\.\pipe\EXTPROC1521ipc)))
+			Services Summary...
+			Service "044a0e2d427e4a1f9e39d4ddc1ed5220.mshome.net" has 1 instance(s).
+			  Instance "orcl", status READY, has 1 handler(s) for this service...
+			Service "52448234712340b69f274bcc790ecfe0.mshome.net" has 1 instance(s).
+			  Instance "orcl", status READY, has 1 handler(s) for this service...
+			Service "CLRExtProc" has 1 instance(s).
+			  Instance "CLRExtProc", status UNKNOWN, has 1 handler(s) for this service...
+	------>	Service "mypdb.mshome.net" has 1 instance(s).
+			  Instance "orcl", status READY, has 1 handler(s) for this service...
+			Service "orcl.mshome.net" has 1 instance(s).
+			  Instance "orcl", status READY, has 1 handler(s) for this service...
+			Service "orclXDB.mshome.net" has 1 instance(s).
+			  Instance "orcl", status READY, has 1 handler(s) for this service...
+			The command completed successfully
+
+
+10. Edit the tnsnames.ora file and replace it with this:
+    a. Edit c:\tools\oracle_home\network\admin\tnsnames.ora
+
+    b. Replace its contents with this:
+       WARNING:  Do not have any spaces before ORCL = ....
+
+			ORCL =
+			  (DESCRIPTION =
+				(ADDRESS_LIST =
+				  (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))
+				)
+				(CONNECT_DATA =
+				  (SERVER = DEDICATED)
+				  (SERVICE_NAME = mypdb.mshome.net)
+				)
+			  )
+
+11. Verify the tnsping works
+    terminal> tnsping orcl
+
+	  You should get this:
+	  Attempting to contact (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = mypdb.mshome.net)))
+	  OK (0 msec)
+
+
+
+
+Part 6:  Create a database user
+-------------------------------
+ 1. Open a terminal
+    terminal> sqlplus / as sysdba
+
+
+ 2. RUn these commands:
+    SQLPLUS> alter session set container = mypdb;
+	SQLPLUS> create user test_user identified by "secret";
+	SQLPLUS> grant all privileges to test_user;
+	SQLPLUS> grant connect to test_user;
+	SQLPLUS> quit
+
+ 3. Verify you can login to Oracle using SQLPLUS
+    terminal> sqlplus test_user/secret@ORCL
+
+	-- This should successfully log in to oracle immediately
+
+    SQLPLUS> quit
+
+
+
+
+Part 7:  Use intelliJ Ultimate to connect to your Oracle Database
+-----------------------------------------------------------------
+ 1. Startup Intellij
+
+ 2. Open the Database Settings
+    Pull View -> Tool Windows -> Database
+
+ 3. Press + Data Source -> Oracle
+
+ 4. In the Oracle Data Source:
+    a. Press "Download" to download the missing oracle driver
+
+	b. Apply these settings:
+			Connection Type:  	Service Name
+			Host:				localhost
+			Port:				1521
+			Service:			mypdb.mshome.net               # This should match what was found running "lsnrctl status"
+
+			Authentication:		User & Password
+			User:				test_user
+			Password:			secret
+			Save:				Forever
+
+	c. Press "Test Connection"
+		-- It should work!!!
+
+
+
+Part 7:  Clone the play-with-oracle project so you can Nuke your database
+-------------------------------------------------------------------------
+ 1. Go to https://github.com/traderres/play-with-oracle
+    NOTE:  This project is already setup to use your Oracle configuration you setup above
+
+ 2. Follow the steps to nuke your Oracle database
+
+
+
+How to Uninstall Oracle19c
+--------------------------
+ 1. Open a CMD window as an **ADMINISTRATOR**
+ 2. Run these commands in the terminal
+    TERMINAL> cd c:\tools\oracle_home\deinstall
+    TERMINAL> deinstall.bat
+
+	Specify all Single Instance listeners:    <Press Enter>
+	Specify the list of database names....    <Press Enter>
+	Do you still want to modify the details?  <Press Enter>
+	Do you want to continue?                   y  <Enter>
+
+	W A I T        3       M I N U T E S
+
+	-- Now, these directories are erased:
+	              c:\tools\oracle_home
+	              c:\tools\oracle_install
