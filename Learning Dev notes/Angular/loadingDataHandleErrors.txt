@@ -1,0 +1,1022 @@
+Lesson 9g:  Loading Data / Async Pipe / Handle Errors
+-----------------------------------------------------
+The Google Drive link is here:<br>
+&nbsp;&nbsp;&nbsp;https://docs.google.com/document/d/1GBNOm6AzTkU7ZQIBESVwdnMxBAZhBg-9HJaMyFunE7Y/edit?usp=sharing
+
+
+The source code for this lesson is here:<br>
+&nbsp;&nbsp;&nbsp;https://github.com/traderres/angularApp1Lessons/tree/lesson9g/async-pipe-handle-errors1
+<br>
+<br>
+
+
+Problem:  How do I handle loading errors when  using the Async Pipe?<br>
+Solution:<br>
+1. Add a subscription variable called LoadingPrioritiesErrorObs that holds true when an error occurs
+1. Have the html template check if the priorities is loading *OR* an error occurred
+
+<br>
+<br>
+<h5>References</h5>
+
+- https://sebastian-holstein.de/post/error-handling-angular-async-pipe/
+<br>
+<br>
+
+
+<br>
+<br>
+<h5>Explanation</h5>
+Consider this block of code:
+
+```
+        <ng-container *ngIf="(prioritiesObs | async) as priorities; else loadingPriorities">
+              <!-- Priorities are fully loaded -->
+              <mat-form-field style="margin-top: 20px">
+                  <mat-label>Choose Priority</mat-label>
+
+                  <!-- Priorities Drop Down -->
+                  <mat-select formControlName="priority">
+                      <mat-option [value]=null>-Select Priority-</mat-option>
+                      <mat-option *ngFor="let priority of priorities"  value="{{priority.id}}">{{priority.name}}</mat-option>
+                  </mat-select>
+
+              </mat-form-field>
+        </ng-container>
+
+        <ng-template #loadingPriorities>
+              <!-- Priorities are loading message -->
+              <p style="margin-top: 20px"><i class="fa fa-spin fa-spinner"></i> Loading Priorities...</p>
+        </ng-template>
+
+```
+
+
+
+
+<br>
+<br>
+<h5>Order of Operations</h5>
+
+1. The async pipe subscribes to the prioritiesObs
+
+2. The first state is the "loading" state because the Observable hasn't emitted a value yet
+   -- So, the else case in our \*ngIf is active.
+   -- loadingPriorities is set
+
+3. The REST call returns a response
+   If the HTTP request responds with an 2xx status code, the user will see the list of priorities
+   If the HTTP request responds with an error, the user sees no error message.
+   If an error occurs, the user still sees loading  (<b>which is NOT the correct behavior</b>)
+   <b>We need to catch the error</b>
+
+<br>
+<br>
+
+```
+Procedure
+---------
+    1. Add a catchError() to the subscribe call
+        a. Edit add-report2.component.ts
+
+        b. Change the prioritiesObs so it can be an observable or null
+            public prioritiesObs: Observable<LookupDTO[] | null>;        // Yes, it can be null
+
+        c. Add a new subject  loadingPriorityErrorObs
+            public loadingPriorityErrorObs = new Subject<boolean>();
+
+        d. Change the ngOnInit() to call code if an error occurs
+
+            From this:
+                this.prioritiesObs = this.lookupService.getLookupWithTypeAndOrder("priority", "display_order");
+
+            To this:
+                this.prioritiesObs = this.lookupService.getLookupWithTypeAndOrder("priority", "display_order").pipe(
+                 catchError((error) => {
+                // Log an error in the console here  (otherwise you will NOT see an error in the console)
+                console.error('error loading the list of priorities: ', error);
+
+                // Send a message to the html that there was an error loading priorities
+                this.loadingPriorityErrorObs.next(true);
+
+                // Recover the observable and give it a "falsy" value of null
+                return of(null);
+                })
+            );
+
+
+
+    2. Display the error in HTML
+       -- The else flag handles either loading *or* errors
+       -- There is another async pipe that listens for errors
+
+        a. Edit the add-report2.component.html priorities section
+
+            Change this:
+                  <ng-container *ngIf="(prioritiesObs | async) as priorities; else loadingPriorities">
+                        <!-- Priorities are fully loaded -->
+                        <mat-form-field style="margin-top: 20px">
+                            <mat-label>Choose Priority</mat-label>
+
+                            <!-- Priorities Drop Down -->
+                            <mat-select formControlName="priority">
+                                <mat-option [value]=null>-Select Priority-</mat-option>
+                                <mat-option *ngFor="let priority of priorities"  value="{{priority.id}}">{{priority.name}}</mat-option>
+                            </mat-select>
+
+                        </mat-form-field>
+                  </ng-container>
+
+                  <ng-template #loadingPriorities>
+                        <!-- Priorities are loading message -->
+                        <p style="margin-top: 20px"><i class="fa fa-spin fa-spinner"></i>
+                            Loading Priorities...
+                        </p>
+                  </ng-template>
+
+
+            To this:
+                 <ng-container *ngIf="(prioritiesObs | async) as priorities; else loadingPrioritiesOrError">
+                    <!-- Priorities are fully loaded -->
+                    <mat-form-field style="margin-top: 20px">
+                        <mat-label>Choose Priority</mat-label>
+
+                        <!-- Priorities Drop Down -->
+                        <mat-select formControlName="priority">
+                            <mat-option [value]=null>-Select Priority-</mat-option>
+                            <mat-option *ngFor="let priority of priorities"  value="{{priority.id}}">{{priority.name}}</mat-option>
+                        </mat-select>
+
+                    </mat-form-field>
+                 </ng-container>
+
+                <ng-template #loadingPrioritiesOrError>
+                <!-- Either the priorities are loading *OR* there is an error -->
+
+                    <div *ngIf="this.loadingPriorityErrorObs | async; else loadingPriorities">
+                        <!-- Priorities Failed to load message -->
+                        Error loading the list of priorities.  Please try again later.
+                    </div>
+
+                    <ng-template #loadingPriorities>
+                            <!-- Priorities are loading -->
+                            <p style="margin-top: 20px"><i class="fa fa-spin fa-spinner"></i>
+                                Loading Priorities...
+                            </p>
+                    </ng-template>
+                </ng-template>
+
+    3. Simulate an error
+        a. Edit add-report2.component.ts
+
+        b. Change  this line:
+                this.prioritiesObs = this.lookupService.getLookupWithTypeAndOrder(
+							"priority", "display_order").pipe(
+
+           To this:
+                this.prioritiesObs = this.lookupService.getLookupWithTypeAndOrder(
+							"INVALID", "display_order").pipe(
+
+
+    4.  Verify that the error message appears
+        a. Run -> Debug 'Full WebApp'
+
+        b. Click on "Add Report 2"
+
+        c. Look at the priorities dropdown
+            -- You should see an error message that the priorities failed to load
+```
+![](https://lh5.googleusercontent.com/9-4BCVl_C2iaAnQMzd5w146HgXNys4UV4wSridjNEqZliK-hX7oFJTaNwRPbBM45DvaPe0cQb1sacEdE9tErUkdi4mgfm8myHxAaJPwKh7-Cv3mCdy90eE3iP2qazslLkGmKlH7w)
+```
+
+
+
+
+
+        d. Edit the ngOnInit(), change the "INVALID_LOOKUP_TYPE" to "priority"
+           -- Look at the priorities dropdown
+           -- You should see the loading message (for 5 seconds)
+           -- Then, you should see the dropdown values
+
+
+```
+Lesson 9h:  Loading Data / Async Pipe / Handle Errors w/Loading Wrapper
+-----------------------------------------------------------------------
+The Google Drive link is here:<br>
+&nbsp;&nbsp;&nbsp;https://docs.google.com/document/d/1ek83iA_5DmMFEIL47TcisnGRF2wFu1PA9a9VNk2208M/edit?usp=sharing
+
+
+The source code for this lesson is here:<br>
+&nbsp;&nbsp;&nbsp;https://github.com/traderres/angularApp1Lessons/tree/lesson9h/async-pipe-handle-errors2
+<br>
+<br>
+<br>
+
+<h3> Problem Set </h3>
+
+Problem: We don't want to have a catchError() on every subscriber call<br>
+Solution: Setup a LoadingWrapper class that will handle the catchError() for us
+
+<br>
+<br>
+The prioritiesObs object has 2 properties:
+
+1. prioritiesObs.dataObs holds the observable to the data
+1. prioritiesObs.errorLoadingObs holds TRUE when an error occurs
+
+
+
+<br>
+<br>
+<h5>Advantages to this Approach</h5>
+
+- We still get to use Async Pipes
+- We don't have to have 2 variables for each REST call -- just one
+- If an error occurs, the Async Pipe can show a custom error
+
+
+
+<br>
+<br>
+<h5>Disadvantages to this Approach</h5>
+
+- Every Async Pipe now has a section to show an error if the dropdown did not load
+- If one dropdown (on a page) does not load, then the entire page is messed-up
+  - So, it's not really recoverable
+  - The user will probably restart the browser or reload the page
+
+- Is it really valuable to show a message, "Loading priorities did not work"....?
+
+<br>
+<br>
+
+```
+Procedure
+---------
+    1. Create the loadingWrapper class
+        a. Create the loading wrapper class
+           unix> cd ~/intellijProjects/angularApp1/frontend
+           unix> ng generate class utilities/loadingWrapper --skipTests
+
+        b. Replace loading-wrapper.ts with this:
+
+                import {Observable, of, Subject} from "rxjs";
+                import {catchError, shareReplay} from "rxjs/operators";
+
+                export class LoadingWrapper<T> {
+                  private readonly _errorLoadingObs = new Subject<boolean>();
+
+                  public readonly errorLoadingObs: Observable<boolean> = this._errorLoadingObs.pipe(
+                        shareReplay(1)
+                  );
+
+                  public readonly dataObs: Observable<T | null>;
+
+                  public constructor(aData: Observable<T>) {
+                    this.dataObs = aData.pipe(
+                          shareReplay(1),
+                          catchError(error => {
+                            // Log an error in the console here
+                            console.log(error);
+
+                            // Emit a "truthy" value for errorLoadingObs
+                            this._errorLoadingObs.next(true);
+
+                            // Recover the observable and give it a "falsy" value of null
+                            return of(null);
+                          })
+                        );
+
+                    }  // end of constructor
+
+                }
+
+
+    2. Use  the LoadingWrapper in add-report2.component.ts
+        a. Edit add-report2.component.ts
+
+        b. Remove loadingPriorityErrorObs
+
+        c. Change prioritiesObs type to be of LoadingWrapper<LookupDTO[]>
+            Change this:
+                public prioritiesObs: Observable<LookupDTO[] | null>;
+            To this:
+                public prioritiesObs: LoadingWrapper<LookupDTO[]>;
+
+
+        d. Change the code in ngOnInit() to use the LoadingWrapper
+
+            From this:
+                  this.prioritiesObs = this.lookupService.getLookupWithTypeAndOrder(
+                                        "priority", "display_order").pipe(
+                  catchError((error) => {
+                        // Log an error in the console here  (otherwise you will NOT see an error in the console)
+                        console.error('error loading the list of priorities: ', error);
+
+                // send a message to the HTML indicating an error occurred
+                        this.loadingErrorObs.next(true);
+
+                        // Recover the observable and give it a "falsy" value of null
+                        return of(null);
+                     })
+            );
+
+
+            To this:
+                this.prioritiesObs = new LoadingWrapper(
+                     this.lookupService.getLookupWithTypeAndOrder("priority", "display_order")
+                );
+
+
+    3. Change the html template to show the error
+        a. Edit add-report2.component.html
+
+        b. Remove priorities from the <ng-container> at the top of the HTML
+
+        c. Change this line
+            From this
+                    <ng-container *ngIf="(prioritiesObs | async) as priorities; else
+                                            loadingPrioritiesOrError">
+
+            To this:
+                    <ng-container *ngIf="(this.prioritiesObs.dataObs | async) as priorities; else
+                                             loadingPrioritiesOrError">
+
+        d. Change this line
+            From this:
+                <div *ngIf="loadingPriorityErrorObs | async; else loadingPriorities">
+
+            To this:
+                <div *ngIf="this.prioritiesObs.errorLoadingObs | async; else loadingPriorities">
+
+
+        e. When completed, the priorities dropdown section looks like this:
+
+            <ng-container *ngIf="(this.prioritiesObs.dataObs | async) as priorities;
+                                        else loadingPrioritiesOrError">
+               <!-- Priorities are fully loaded -->
+               <mat-form-field style="margin-top: 20px">
+                <mat-label>Choose Priority</mat-label>
+
+                <!-- Priorities Drop Down -->
+                <mat-select formControlName="priority">
+                    <mat-option [value]=null>-Select Priority-</mat-option>
+                    <mat-option *ngFor="let priority of priorities"
+                            value="{{priority.id}}">{{priority.name}}</mat-option>
+                </mat-select>
+
+               </mat-form-field>
+            </ng-container>
+
+
+            <ng-template #loadingPrioritiesOrError>
+                 <!-- Either priorities are loading OR there was an error -->
+
+                <div *ngIf="this.prioritiesObs.errorLoadingObs | async; else loadingPriorities">
+                    <!-- Priorities Failed to load message -->
+                    Error loading the list of priorities.  Please try again later.
+                 </div>
+
+                <ng-template #loadingPriorities>
+                    <!-- Priorities are loading message -->
+                    <p style="margin-top: 20px"><i class="fa fa-spin fa-spinner"></i>
+                         Loading Priorities...
+                    </p>
+                 </ng-template>
+
+            </ng-template>
+
+
+
+
+    4. Simulate an error
+        a. Edit add-report2.component.ts
+        b. Change this line within the ngOnInit()
+
+            From this:
+           	    this.lookupService.getLookupWithTypeAndOrder("priority", "display_order")
+
+            To this:
+                this.lookupService.getLookupWithTypeAndOrder("INVALID_LOOKUP_TYPE", "display_order")
+
+
+
+    5. Verify that the error message appears
+        a. Pull Run -> Debug 'Full WebApp'
+        b. Click on "Add Report 2"
+        c. Look at the priorities dropdown
+           -- You should see an error message that the priorities failed to load
+```
+![](https://lh4.googleusercontent.com/JeO6E2JheiZ5ufHJmBTQ72hfceJrzcTb4Xf9UobKehrn61nfGl5a72kRiRnOxU-PIFmoEDRnQwnJ_m4Z_LA867K6rCu43o6JWO4BqlIk5fetWzc0cskX-AoI1c63yM6jEqqN0wp9)
+```
+
+
+
+
+        d. In ngOnInit(), change the "INVALID_LOOKUP_TYPE" to "priority"
+
+        e. Look at the priorities dropdown
+           -- You should see the loading message (for 5 seconds)
+           -- Then, you should see the dropdown values
+
+
+
+
+
+When finished, add-report2-component.ts looks like this:
+
+    import {Component, OnInit} from '@angular/core';
+    import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+    import {ValidatorUtils} from "../../validators/validator-utils";
+    import {MessageService} from "../../services/message.service";
+    import {LookupService} from "../../services/lookup.service";
+    import {LookupDTO} from "../../models/lookup-dto";
+    import {Observable} from "rxjs";
+    import {LoadingWrapper} from "../../utilities/loading-wrapper";
+
+
+    @Component({
+      selector: 'app-add-report2',
+      templateUrl: './add-report2.component.html',
+      styleUrls: ['./add-report2.component.css']
+    })
+    export class AddReport2Component implements OnInit {
+      public myForm: FormGroup;
+
+      public prioritiesObs: LoadingWrapper<LookupDTO[]>;
+
+      public authorsObs: Observable<LookupDTO[]>;
+      public reportSourceObs: Observable<LookupDTO[]>;
+
+
+      constructor(private lookupService: LookupService,
+                private formBuilder: FormBuilder,
+                private messageService: MessageService)
+                { }
+
+      public ngOnInit(): void {
+
+        // Get the observable a list of LookupDTO objects for priorities
+        // NOTE:  The AsyncPipe will subscribe and unsubscribe automatically
+        this.authorsObs = this.lookupService.getLookupWithTypeAndOrder("author", "name")
+        this.reportSourceObs = this.lookupService.getLookupWithTypeAndOrder("report_source", "name")
+
+        this.prioritiesObs = new LoadingWrapper(
+            this.lookupService.getLookupWithTypeAndOrder("priority", "display_order")
+        );
+
+
+        // Initialize the form object with the proper validators
+        this.myForm = this.formBuilder.group({
+        report_name: ['initial name',
+            [
+            Validators.required,
+            Validators.minLength(2),
+            Validators.maxLength(100)
+            ]],
+
+        source: ['', Validators.required],
+        priority:  ['', Validators.required],
+
+        authors:  ['',
+            [
+                Validators.required,
+                ValidatorUtils.validateMultipleSelect(1,2)
+            ]]
+        });
+
+      } // end of ngOnInit()
+
+
+    public reset() {
+        console.log('user pressed reset');
+        this.myForm.reset();
+      }
+
+      public save() {
+        console.log('User pressed save.');
+
+        // Mark all fields as touched so the user can see any errors
+        this.myForm.markAllAsTouched();
+
+        if (this.myForm.invalid) {
+        // User did not pass validation so stop here
+        return;
+        }
+
+        this.messageService.showSuccessMessage("Failed to save your record.  An error occurred.")
+
+        // User enter valid data
+        console.log('Valid data:  report_name=' + this.myForm.controls.report_name.value);
+      }
+
+    }
+
+
+When finished add-report2.component.html looks like this:
+
+    <!-- Subscribe to Multiple Observables -->
+    <ng-container *ngIf="
+        {
+            report_sources: reportSourceObs | async,
+            authors: authorsObs | async
+        } as data;">
+
+
+       <mat-card>
+        <mat-card-title>Add a Report 2</mat-card-title>
+
+        <form novalidate autocomplete="off" [formGroup]="myForm" >
+
+            <mat-card-content>
+
+            <mat-form-field>
+                    <mat-label>Enter Report Name</mat-label>
+
+                    <!-- Use the matInput for input fields inside <mat-form-field>...</mat-form-field> tags -->
+                    <input matInput type="text"  formControlName="report_name" />
+
+                    <mat-error>
+                        Report Name is required
+                    </mat-error>
+            </mat-form-field>
+            <br/>
+
+            <ng-container *ngIf="data.report_sources; else loadingReportSources">
+                    <!-- Report Sources are loaded -->
+                    <mat-form-field style="margin-top: 20px">
+                        <mat-label>Choose Source</mat-label>
+
+                        <!-- Report Sources Dropdown -->
+                        <mat-select formControlName="source">
+                            <mat-option [value]=null>-Select Source-</mat-option>
+                            <mat-option *ngFor="let source of data.report_sources"
+                        value="{{source.id}}">{{source.name}}</mat-option>
+                        </mat-select>
+
+                        <mat-error>
+                            Source is required
+                        </mat-error>
+                    </mat-form-field>
+            </ng-container>
+
+            <ng-template #loadingReportSources>
+                    <!-- Report Sources are loading message -->
+                    <p style="margin-top: 20px"><i class="fa fa-spin fa-spinner"></i> Loading Report Sources...</p>
+            </ng-template>
+
+            <br/>
+
+
+    <ng-container *ngIf="(prioritiesObs.dataObs | async) as priorities; else loadingPrioritiesOrError">
+     <!-- Priorities are fully loaded -->
+     <mat-form-field style="margin-top: 20px">
+                <mat-label>Choose Priority</mat-label>
+
+                <!-- Priorities Drop Down -->
+                <mat-select formControlName="priority">
+                    <mat-option [value]=null>-Select Priority-</mat-option>
+                    <mat-option *ngFor="let priority of priorities"
+                          value="{{priority.id}}">{{priority.name}}</mat-option>
+                </mat-select>
+
+            </mat-form-field>
+    </ng-container>
+
+    <ng-template #loadingPrioritiesOrError>
+        <!-- Either priorities are still loading OR there was an error -->
+
+     <div *ngIf="prioritiesObs.errorLoadingObs | async; else loadingPriorities">
+            <!-- Priorities Failed to load message -->
+            Error loading the list of priorities.  Please try again later.
+        </div>
+
+        <ng-template #loadingPriorities>
+              <!-- Priorities are loading message -->
+              <p style="margin-top: 20px"><i class="fa fa-spin fa-spinner"></i> Loading Priorities...</p>
+     </ng-template>
+
+    </ng-template>
+            <br/>
+
+
+     <ng-container *ngIf="data.authors; else loadingAuthors">
+                <!-- Authors are loaded -->
+                <mat-form-field style="margin-top: 20px">
+                    <mat-label>Choose Authors</mat-label>
+
+                    <mat-select multiple formControlName="authors">
+                        <mat-option *ngFor="let author of data.authors"
+                    value="{{author.id}}">{{author.name}}</mat-option>
+                    </mat-select>
+
+                    <mat-error *ngIf="myForm.controls?.authors?.errors?.required">
+                        Authors are required
+                    </mat-error>
+
+                    <mat-error *ngIf="myForm.controls?.authors?.errors?.custom_error">
+                        {{myForm.controls?.authors?.errors?.custom_error}}
+                    </mat-error>
+
+                </mat-form-field>
+     </ng-container>
+
+     <ng-template #loadingAuthors>
+                <!-- Authors are loading message -->
+                <p style="margin-top: 20px"><i class="fa fa-spin fa-spinner"></i> Loading Authors...</p>
+     </ng-template>
+     <br/>
+
+            <!-- Use the pretty material design buttons -->
+            <button type="button" (click)="reset()" style="margin-top: 20px" mat-raised-button>Reset</button>&nbsp;&nbsp;
+            <button type="button" (click)="save()" mat-raised-button color="primary">Save</button>&nbsp;
+            </mat-card-content>
+
+         </form>
+
+
+       </mat-card>
+
+    </ng-container>
+
+
+    <pre>
+      myForm.valid={{this.myForm.valid}}
+      myForm.controls.report_name.errors={{this.myForm.controls?.report_name?.errors | json}}
+      myForm.controls.priority.errors={{this.myForm.controls?.priority?.errors | json}}
+      myForm.controls.source.errors={{this.myForm.controls?.source?.errors | json}}
+      myForm.controls.authors.errors={{this.myForm.controls?.authors?.errors | json}}
+      myForm.controls.authors.valid={{myForm.controls.authors.valid }}
+    </pre>
+
+
+
+
+```
+Lesson 9i:  Loading Data / Async Pipe / Handle Errors w/Interceptor
+-------------------------------------------------------------------
+The Google Drive link is here:<br>
+&nbsp;&nbsp;&nbsp;https://docs.google.com/document/d/10ZIBw7GdoGPYuQ-rkw2uire3MpzIbH9enUzmAOclc3I/edit?usp=sharing
+
+
+The source code for this lesson is here:<br>
+&nbsp;&nbsp;&nbsp;https://github.com/traderres/angularApp1Lessons/tree/lesson9i/async-pipe-handle-errors3
+<br>
+<br>
+Problem: We want to show a dialog box if any REST call fails
++ User does not leave the page
++ User can see the error message in a dialog box
++ It handles \*ALL\* rest calls so we don't need to add catchError() calls everywhere
++ We do not have to write HTML saying "Priorities would not load" \[which should be an unlikely event]
+
+
+<br>
+<br>
+<h3>Approach</h3>
+
+1. Create the ErrorDialogBox component (to display the error)
+
+1. Create an ErrorService with two methods: addError() and getErrors()
+
+1. Have the main page (app.component.ts) listen for errors (using the ErrorService)
+
+   - Main Page injects the ErrorService
+   - Main Page listens for errors using errorService.getErrors()
+     -- If an error is found, then show the dialog box
+
+1. Create an Interceptor that adds errors (using the ErrorService)
+
+   - Inject the ErrorService into the new Interceptor
+   - If an error is found in a REST call, then call errorService.addError()
+
+![](./images/lesson09i_image1.png)
+
+
+<br>
+<br>
+<h5>Screen Shot</h5>
+
+Any REST call that fails will show a popup error (without leaving the screen)
+
+![](https://lh3.googleusercontent.com/jwyeGOcfrrHe4d_LEfFipJCdKx6ilg2zXmCMveL9esABg_3_V8cNPnlRufJNoa82MwenMS7UjT9cM0NQR_WveRE7c09f374wHP7XSdBZxxeNP0pO_nHhAWCaBMzZb8MrsknarvLr)
+<br>
+<br>
+<br>
+
+```
+Procedure
+---------
+    1. Make sure that your app.module.ts has the MatDialogModule
+        a. Edit app.module.ts
+
+        b. Verify that you see this module in the imports section
+              MatDialogModule,
+
+
+
+    2. Create the Error Dialog Box Form Data  (used to pass-in data to the Dialog Box)
+        a. Create this class:  error-dialog-form-data.ts
+           unix> cd ~/intellijProjects/angularApp1/frontend
+           unix> ng generate class errorHandler/errorDialogFormData --skipTests
+
+        b. Copy this to the newly-created class:
+            export class ErrorDialogFormData {
+                status_code: number;
+                message: string;
+                url: string | null;
+                error_text: string;
+            }
+
+
+    3. Create the ErrorDialogBox component
+        a. Create the error dialog box
+           unix> cd ~/intellijProjects/angularApp1/frontend
+           unix> ng generate component errorHandler/errorDialog --skipTests
+
+        b. Replace error-dialog.component.ts with this:
+
+            import {Component, Inject} from '@angular/core';
+            import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
+            import {ErrorDialogFormData} from "../error-dialog-form-data";
+
+            @Component({
+              selector: 'app-error-dialog',
+              templateUrl: './error-dialog.component.html',
+              styleUrls: ['./error-dialog.component.css']
+            })
+            export class ErrorDialogComponent  {
+
+              constructor(private dialogRef: MatDialogRef<ErrorDialogComponent>,
+                        @Inject(MAT_DIALOG_DATA) public data: ErrorDialogFormData)
+            {}
+
+              public onCancelClick(): void {
+                this.dialogRef.close();
+              }
+            }
+
+
+        c. Replace error-dialog.component.html with this:
+
+            <h2 mat-dialog-title>{{this.data.status_code}}&nbsp;{{this.data.error_text}}</h2>
+
+            <div mat-dialog-content>
+              This URL failed: {{this.data.url}}<br/><br/>
+              {{this.data.message}}
+            </div>
+
+            <div mat-dialog-actions>
+              <button type="button" mat-button mat-raised-button color="primary" class="button-class"
+                    (click)="this.onCancelClick()">Close
+              </button>
+            </div>
+
+    4. Create the ErrorService
+        a. Create the service
+           unix> cd ~/intellijProjects/angularApp1/frontend
+           unix> ng generate service errorHandler/error  --skipTests
+
+        b. Replace the error.service.ts with this:
+
+            import { Injectable } from '@angular/core';
+            import {Observable, Subject} from "rxjs";
+            import {HttpErrorResponse} from "@angular/common/http";
+
+            @Injectable({
+              providedIn: 'root'
+            })
+            export class ErrorService {
+
+              private errors = new Subject<HttpErrorResponse>();
+
+              constructor() { }
+
+
+              public addError(aError: HttpErrorResponse): void {
+                this.errors.next(aError);
+              }
+
+
+              public getErrors(): Observable<HttpErrorResponse> {
+                return this.errors.asObservable();
+              }
+
+            }
+
+    5. Tell the app.component.ts to show the Dialog Box if an error occurs
+        a. Edit app.component.ts
+
+
+        b. Add these 3 variables:
+            private errorSubscription: Subscription;
+            private errorDialogIsOpen = false;
+            private errorDialogRef: MatDialogRef<ErrorDialogComponent, any>;
+
+
+        c. Inject the ErrorService and MatDialog service
+            constructor(
+                . . .
+                private errorService: ErrorService,
+                        private matDialog: MatDialog
+                    )
+            {}
+
+
+
+        d. Add this code to the ngOnDestroy() method
+
+            if (this.errorSubscription) {
+                this.errorSubscription.unsubscribe();
+            }
+
+
+
+        e. Add this to the ngOnInit() method on app.component.ts:
+
+            this.errorSubscription =
+                 this.errorService.getErrors().subscribe( (aError: HttpErrorResponse) => {
+                        // An error came in.  So, display the error in a popup
+
+                        // Create the form data object (to pass-in to the dialog box)
+                        let errorFormData: ErrorDialogFormData = new ErrorDialogFormData();
+                        errorFormData.error_text = aError.statusText;
+                        errorFormData.status_code = aError.status
+                        errorFormData.url = aError.url;
+
+                        if (typeof aError.error === 'object') {
+                            // The aError.error is an object.  So, pull the error from aError.error.message
+                            errorFormData.message = aError.error.message;
+                        }
+                        else {
+                            // The aError.error is not an object.  So, pull the error from aError.error
+                            errorFormData.message = aError.error;
+                        }
+
+                        if (this.errorDialogIsOpen) {
+                            // The error dialog is already open -- so close it
+                            this.errorDialogRef.close(false);
+                        }
+
+                        this.errorDialogIsOpen = true;
+
+                        // Open the Error Dialog
+                        // Do not set the height of dialog boxes.  Let them grow
+                        this.errorDialogRef = this.matDialog.open(ErrorDialogComponent, {
+                            minWidth: '400px',
+                            maxWidth: '800px',
+                            data: errorFormData
+                        });
+
+                        this.errorDialogRef.afterClosed().subscribe((formData: ErrorDialogFormData) => {
+                            // The error dialog box has closed
+                            this.errorDialogIsOpen = false;
+                        });
+
+                   });
+
+
+    6. Create the ErrorInterceptor (that will intercept *ALL* REST calls)
+        a. Create the MyInterceptor class
+           unix> cd ~/intellijProjects/angularApp1/frontend
+           unix> ng generate interceptor errorHandler/error  --skipTests
+
+        b. Replace error.interceptor.ts with this::
+
+            import { Injectable } from '@angular/core';
+            import {
+              HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse
+            } from '@angular/common/http';
+            import {Observable, throwError} from 'rxjs';
+            import {ErrorService} from "./error.service";
+            import {catchError} from "rxjs/operators";
+
+            @Injectable()
+            export class ErrorInterceptor implements HttpInterceptor {
+
+              constructor(private errorService: ErrorService)
+              {}
+
+              public intercept(request: HttpRequest<unknown>, next: HttpHandler):
+                                            Observable<HttpEvent<any>>
+               {
+                return next.handle(request).pipe(
+                    catchError( (error: HttpErrorResponse) => this.handleErrorRestCall(error))
+                );
+
+              } // end of method
+
+              private handleErrorRestCall(err: HttpErrorResponse): Observable<any> {
+                if (err.status < 200 || err.status >= 300) {
+                    // A REST call raised an error.  So, send the info to the ErrorService
+                    // Send the error message to the errorService
+                    this.errorService.addError(err);
+                }
+
+                // Throw the error
+                return throwError(err);
+              }
+            }
+
+        c. Register the ErrorInterceptor class
+            i. Edit app.module.ts
+
+            ii. Add this to the providers: section
+
+                providers: [
+                    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+                  ],
+
+
+
+    7. Setup the Add Report 2 Page so that it looks for a regular observable.
+        a. Edit add-report2.component.ts
+        b. Adjust the ngOnInit()
+
+            Change this line
+               this.prioritiesObs = new LoadingWrapper(
+                    this.lookupService.getLookupWithTypeAndOrder("priority", "display_order")
+                );
+
+            To this:
+               this.prioritiesObs = this.lookupService.getLookupWithTypeAndOrder(
+                                            "priority555555", "display_order");
+
+
+            NOTE:  We are removing the LoadingWrapper
+
+
+        c. Change the prioritiesObs object to a regular Observable:
+              public prioritiesObs: Observable<LookupDTO[]>;
+
+
+    8. Edit add-report2.component.html
+        a. Change the top so that it's using a multiple observable
+                <ng-container *ngIf="
+                    {
+                        report_sources: this.reportSourceObs | async,
+                        authors: this.authorsObs | async,
+                        priorities: this.prioritiesObs | async
+                    } as data;">
+
+
+                        b. Change the priorities so that it looks for data.priorities
+
+                  <ng-container *ngIf="data.priorities; else loadingPriorities">
+                     <!-- Priorities are fully loaded -->
+                     <mat-form-field style="margin-top: 20px">
+                        <mat-label>Choose Priority</mat-label>
+
+                        <!-- Priorities Drop Down -->
+                        <mat-select formControlName="priority">
+                            <mat-option [value]=null>-Select Priority-</mat-option>
+                            <mat-option *ngFor="let priority of data.priorities"  value="{{priority.id}}">{{priority.name}}</mat-option>
+                        </mat-select>
+
+                      </mat-form-field>
+                  </ng-container>
+
+                  <ng-template #loadingPriorities>
+                   <!-- Priorities are loading message -->
+                    <p style="margin-top: 20px"><i class="fa fa-spin fa-spinner"></i>
+                         Loading Priorities...
+                    </p>
+                  </ng-template>
+
+
+
+
+
+
+    9. Verify it works
+        a. Activate the debugger
+        b. Go to the "Add Report 2" page
+           -- You should see the error popup appear
+```
+![](https://lh3.googleusercontent.com/9JdDmRu8C2f4yr65t9mbkFxYFfa4yNyF5XCAdbqqoDmKmTpHwoxIIzJxqKO3il4yGjYY2MBqMCoavnRGYGgjlbkTIhuIdO_FIV1cKRhI3qTSaFSCvmLOvY_yi69u1JXZrmF6i35C)
+```
+
+
+
+
+
+    10. Adjust the REST endpoint so it works correctly.
+        a. Edit add-report2.component.ts
+        b. Adjust the ngOnInit()
+
+            Change this line
+               this.prioritiesObs = this.lookupService.getLookupWithTypeAndOrder(
+                                            "priority555555", "display_order");
+
+            To this:
+               this.prioritiesObs = this.lookupService.getLookupWithTypeAndOrder(
+                                            "priority", "display_order");
+
+    11. Verify it works correctly:
+        a. Activate the debugger
+        b. Go to the "Add Report 2" page
+           -- You should see the dropdowns load normally
+
+
+        But, any REST call that fails will be automatically caught and a popup displayed
+
+```

@@ -1,0 +1,187 @@
+Lesson:  Setup Flyway
+---------------------
+
+Assumptions:
+ A) You have a Postgres 9.5 or later database
+ B) You have created a database schema
+    unix> psql -U postgres -h localhost
+
+      drop database app1_db;
+
+      create database app1_db;
+      create user app1_user with password 'secret';
+      grant all privileges on database app1_db to app1_user;
+      alter database app1_db     SET search_path=app1_db;
+      alter role     app1_user   SET search_path=app1_db;
+      \q
+
+
+Procedure
+---------
+ 1. Setup the database-migration directory structure
+    unix> cd ~/intellijProjects/angularApp1
+    unix> mkdir -p backend/src/main/resources/db/migration
+    *OR*
+    Create these directories in Intellij
+
+
+ 2. Create this file:  V1.1__baseline.sql
+    a. In Intellij, right-click on backend/src/main/resources/db/migration/ -> New File:
+       Filename:  V1.1__baseline.sql
+
+    b. Copy this to your new file:
+        --------------------------------------------------------------
+        -- Filename:  V1.1__baseline.sql
+        --------------------------------------------------------------
+
+        -- Create a sequence called "seq_table_ids"
+        Create sequence seq_table_ids increment by 1 START WITH 1000;
+
+
+ 3. Edit the backend/pom.xml
+    We need to add the flyway dependencies and the JDBC dependency (so Flyway can talk to your database)
+    a. In Intellij, edit the backend/pom.xml
+
+    b. Add these 2 dependencies to the <dependencies>...</dependencies> section
+
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>6.5.7</version>
+            </dependency>
+
+            <dependency>
+                <!-- Database Driver that Flyway will use to talk to the database -->
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.2.18</version>
+            </dependency>
+
+
+    c. Add the maven flyway plugin to the <plugins>...</plugins> section
+
+            <plugin>
+              <groupId>org.flywaydb</groupId>
+              <artifactId>flyway-maven-plugin</artifactId>
+              <version>6.5.7</version>
+
+              <configuration>
+                  <!-- Set the postgres credentials when running mvn flyway:migrate from command-line -->
+                  <user>app1_user</user>
+                  <password>secret</password>
+                  <url>jdbc:postgresql://localhost:5432/app1_db</url>
+                  <schemas>app1_db</schemas>
+              </configuration>
+            </plugin>
+
+	d. Right-click on your backend/pom.xml -> Maven -> Reload Project
+
+
+ 4. Verify that the backend/pom.xml has the *SAME* version for flyway-core *AND* the flyway-maven-plugin -- e.g., 6.5.7
+
+
+ 5. Try it out
+    unix> cd ~/intellijProjects/angularApp1
+    unix> mvn clean install
+
+    unix> cd backend
+    unix> mvn flyway:info
+
+        [INFO]
+        [INFO] --- flyway-maven-plugin:6.5.7:info (default-cli) @ database-migration ---
+        [INFO] Flyway Community Edition 6.5.7 by Boxfuse
+        [INFO] Database: jdbc:postgresql://localhost:5432/app1_db (PostgreSQL 9.6)
+        [INFO] Schema version: << Empty Schema >>
+        [INFO]
+        [INFO]
+        +-----------+---------+-------------+------+--------------+---------+
+        | Category  | Version | Description | Type | Installed On | State   |
+        +-----------+---------+-------------+------+--------------+---------+
+        | Versioned | 1.1     | baseline    | SQL  |              | Pending |
+        +-----------+---------+-------------+------+--------------+---------+
+
+
+ 6. Upgrade your database to 1.1
+    unix> mvn flyway:migrate
+
+
+ 7. Now, look at the info.  You should see this:
+    unix> mvn flyway:info
+
+       [INFO] --- flyway-maven-plugin:6.5.7:info (default-cli) @ database-migration ---
+       [INFO] Flyway Community Edition 6.5.7 by Boxfuse
+       [INFO] Database: jdbc:postgresql://localhost:5432/app1_db (PostgreSQL 9.6)
+       [INFO] Schema version: 1.1
+       [INFO]
+       [INFO]
+       +-----------+---------+------------------------------+--------+---------------------+---------+
+       | Category  | Version | Description                  | Type   | Installed On        | State   |
+       +-----------+---------+------------------------------+--------+---------------------+---------+
+       |           |         | << Flyway Schema Creation >> | SCHEMA | 2020-06-07 18:15:42 | Success |
+       | Versioned | 1.1     | baseline                     | SQL    | 2020-06-07 18:15:42 | Success |
+       +-----------+---------+------------------------------+--------+---------------------+---------+
+
+
+ 8. Re-initialize your database
+    unix> mvn flyway:clean     # Remove everything from the database
+    unix> mvn flyway:migrate   # Create the tables and sequences to version 1.1
+
+
+
+
+
+How to Setup a Postgres Database (using Flyway)
+-----------------------------------------------
+Flyway calls this process "baseline".  We are going to create some tables and then have flyway "baseline" it.
+
+
+Assumptions
+ A) You have a postgres database listening on localhost:5432
+ B) You want to create a new database schema
+ C) You want to add 3 tables to this schema
+
+
+References
+----------
+https://flywaydb.org/documentation/database/postgresql
+
+
+Procedure
+---------
+ 1. Create your postgres database schema
+       unix> sudo -s
+       unix> sudo su - postgres
+       unix> psql
+
+               postgres=# CREATE USER userinfo WITH PASSWORD 'secret';
+               postgres=# CREATE DATABASE userinfo;
+               postgres=# GRANT ALL PRIVILEGES ON DATABASE userinfo to userinfo;
+               postgres=# \l -- (verify new database exists)
+               postgres=# \q
+
+
+
+ 2. Add your tables to your postgres database schema
+
+       unix> sudo -s
+       unix> sudo su - postgres
+       unix> psql
+
+
+            --------------------------------------------------------------------
+            -- Users Table
+            --------------------------------------------------------------------
+            create table users(
+              id                serial        not null,
+              dn                varchar(256)  not null,
+              lastlogindate     date          not null,
+              fullname          varchar(150)      null,
+              emailaddress      varchar(256)      null,
+              phonenumber       varchar(30)       null,
+              PRIMARY KEY(id)
+            );
+
+
+ 3. Baseline the schema
+
+

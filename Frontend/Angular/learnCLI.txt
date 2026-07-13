@@ -1,3 +1,0 @@
-This is how we generate components
-
-ng generate component stuff
