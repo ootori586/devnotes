@@ -1,0 +1,159 @@
+Playwright Locators
+Overview
+Locators are how Playwright finds and interacts with elements on a web page.
+A good locator should be:
+•	Reliable
+•	Readable
+•	Easy to maintain
+•	Resistant to UI changes
+Playwright recommends using user-facing locators whenever possible.
+________________________________________
+Locator Priority
+Use locators in this order whenever possible:
+1.	getByRole()
+2.	getByLabel()
+3.	getByPlaceholder()
+4.	getByText()
+5.	getByTestId()
+6.	locator() (CSS/XPath only when necessary)
+________________________________________
+getByRole()
+Best choice for buttons, links, checkboxes, and other accessible elements.
+Example:
+await page.getByRole('button', { name: 'Save' }).click();
+Benefits:
+•	Readable
+•	Accessibility-friendly
+•	Less likely to break
+________________________________________
+getByLabel()
+Best for input fields with labels.
+Example:
+await page.getByLabel('Username').fill('Melanie');
+________________________________________
+getByPlaceholder()
+Useful when an input uses placeholder text.
+Example:
+await page.getByPlaceholder('Search').fill('Playwright');
+________________________________________
+getByText()
+Finds visible text on the page.
+Example:
+await page.getByText('Download Report').click();
+________________________________________
+getByTestId()
+Best when developers provide test IDs.
+Example:
+await page.getByTestId('save-button').click();
+________________________________________
+locator()
+Use when other locator methods are not suitable.
+Example:
+const rows = page.locator('table tbody tr');
+Useful for:
+•	Tables
+•	Grids
+•	Dynamic elements
+•	Complex selectors
+________________________________________
+Chaining Locators
+You can narrow searches by chaining locators.
+Example:
+const saveButton = page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Save' });
+This improves readability and avoids matching the wrong element.
+________________________________________
+Filtering Locators
+Use filter() to narrow results.
+Example:
+page
+    .getByRole('row')
+    .filter({ hasText: 'Classified Mailing' });
+This was especially useful when locating rows in dynamic tables.
+________________________________________
+Exact Matching
+Sometimes multiple elements have similar names.
+Use:
+exact: true
+Example:
+await page.getByRole('button', {
+    name: 'Save',
+    exact: true
+});
+This prevents partial matches.
+________________________________________
+Working with Collections
+Locate multiple elements:
+const rows = page.locator('tbody tr');
+First row:
+await rows.first().click();
+Last row:
+await rows.last().click();
+Specific row:
+await rows.nth(2).click();
+________________________________________
+Dynamic Tables
+For grids and tables:
+1.	Locate the rows.
+2.	Filter by text.
+3.	Find the desired cell or button.
+4.	Perform the action.
+Example:
+const row = page
+    .getByRole('row')
+    .filter({ hasText: 'Classified Mailing' });
+
+await row.click();
+________________________________________
+Locator Assertions
+Use Playwright assertions before interacting with elements when appropriate.
+Examples:
+await expect(locator).toBeVisible();
+
+await expect(locator).toBeEnabled();
+
+await expect(locator).toHaveText('Complete');
+These assertions make tests more reliable.
+________________________________________
+Common Mistakes
+Using long CSS selectors
+❌
+page.locator('div > div > table > tbody > tr > td:nth-child(4)');
+These are difficult to maintain.
+________________________________________
+Using hard waits
+Avoid:
+await page.waitForTimeout(5000);
+Prefer waiting for an element to become visible or enabled.
+________________________________________
+Ignoring accessibility locators
+Whenever possible, prefer getByRole() over CSS selectors.
+________________________________________
+Lessons Learned from My First Automation Project
+•	getByRole() was my preferred locator whenever possible.
+•	filter({ hasText: ... }) was very helpful for finding rows in dynamic tables.
+•	exact: true helped avoid selecting the wrong element when names were similar.
+•	Breaking complex locators into smaller chained locators made the code easier to read and maintain.
+•	Verifying that an element was visible before interacting with it reduced flaky tests.
+________________________________________
+Best Practices
+•	Prefer user-facing locators.
+•	Keep locators simple.
+•	Avoid brittle CSS selectors.
+•	Use chaining instead of long selectors.
+•	Use filter() for dynamic tables.
+•	Add assertions when appropriate before interacting with elements.
+•	Reuse locators inside Page Objects rather than duplicating them across tests.
+________________________________________
+Quick Summary
+Locator	Best Used For
+getByRole()	Buttons, links, menus, checkboxes
+getByLabel()	Form inputs
+getByPlaceholder()	Search and input fields
+getByText()	Visible text
+getByTestId()	Elements with test IDs
+locator()	Complex or dynamic elements
+filter()	Narrowing search results
+nth(), first(), last()	Working with collections
+

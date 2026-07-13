@@ -1,0 +1,125 @@
+Waits and Assertions in Playwright
+Overview
+Playwright automatically waits for many actions, but there are times when explicit waits and assertions are necessary to ensure tests are reliable.
+The goal is to wait for the application to be ready—not for a fixed amount of time.
+________________________________________
+Auto-Waiting
+Playwright automatically waits before performing actions such as:
+•	Clicking buttons
+•	Filling input fields
+•	Selecting options
+•	Typing text
+Example:
+await page.getByRole('button', { name: 'Save' }).click();
+Playwright waits until the button is visible, enabled, and ready to receive the click.
+________________________________________
+Assertions
+Assertions verify that the application is in the expected state.
+Example:
+await expect(page.getByText('Success')).toBeVisible();
+Assertions automatically retry until they pass or the timeout is reached.
+________________________________________
+Common Assertions
+Verify an element is visible
+await expect(locator).toBeVisible();
+________________________________________
+Verify an element is hidden
+await expect(locator).toBeHidden();
+________________________________________
+Verify an element is enabled
+await expect(locator).toBeEnabled();
+________________________________________
+Verify an element is disabled
+await expect(locator).toBeDisabled();
+________________________________________
+Verify text
+await expect(locator).toHaveText('Completed');
+________________________________________
+Verify partial text
+await expect(locator).toContainText('Completed');
+________________________________________
+Verify an input value
+await expect(locator).toHaveValue('John Smith');
+________________________________________
+Verify the page URL
+await expect(page).toHaveURL(/reports/);
+________________________________________
+Waiting for Elements
+Sometimes an element exists but is not yet ready for interaction.
+Example:
+await locator.waitFor({ state: 'visible' });
+Possible states include:
+•	visible
+•	hidden
+•	attached
+•	detached
+________________________________________
+Waiting for Downloads
+Always start waiting before clicking the download button.
+Example:
+const downloadPromise = page.waitForEvent('download');
+
+await reportsPage.downloadPdf();
+
+const download = await downloadPromise;
+________________________________________
+Waiting for Dialogs
+If a dialog opens after clicking a button:
+await expect(dialog).toBeVisible();
+Interact with the dialog only after confirming it is visible.
+________________________________________
+Waiting for Dynamic Tables
+When working with tables or grids, wait until the desired row appears.
+Example:
+const row = page.getByRole('row').filter({ hasText: 'Classified Mailing' });
+
+await expect(row).toBeVisible();
+________________________________________
+Avoid Hard Waits
+Avoid using:
+await page.waitForTimeout(5000);
+Hard waits make tests slower and less reliable.
+Instead, wait for a specific condition:
+await expect(locator).toBeVisible();
+________________________________________
+Common Mistakes
+Clicking Too Soon
+❌
+Clicking before the element is ready.
+✅
+Verify the element is visible or enabled first.
+________________________________________
+Waiting for Fixed Time
+❌
+await page.waitForTimeout(3000);
+✅
+Wait for the expected condition instead.
+________________________________________
+Missing await
+Forgetting await can cause the test to continue before an action or assertion has completed.
+________________________________________
+Lessons Learned from My First Automation Project
+•	Let Playwright's auto-waiting handle most interactions.
+•	Use assertions to confirm the page is ready before continuing.
+•	Wait for download events before clicking the download button.
+•	Verify dynamic table rows exist before interacting with them.
+•	Avoid hard-coded delays whenever possible.
+•	Assertions helped reduce flaky tests and made failures easier to understand.
+________________________________________
+Best Practices
+•	Trust Playwright's built-in auto-waiting.
+•	Use assertions to verify application state.
+•	Wait for events instead of fixed delays.
+•	Keep waits tied to meaningful conditions.
+•	Avoid unnecessary waitForTimeout() calls.
+________________________________________
+Quick Summary
+Action	Recommended Approach
+Wait for an element	await expect(locator).toBeVisible()
+Wait for a download	page.waitForEvent('download')
+Wait for a dialog	await expect(dialog).toBeVisible()
+Verify text	toHaveText() or toContainText()
+Verify input value	toHaveValue()
+Avoid flaky tests	Wait for conditions, not time
+Avoid	waitForTimeout() unless absolutely necessary
+

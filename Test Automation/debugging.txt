@@ -1,0 +1,149 @@
+Debugging in Playwright
+Overview
+Debugging is the process of finding and fixing issues in automated tests. Playwright provides several built-in tools that make it easier to understand why a test is failing.
+When debugging, change only one thing at a time so you know what solved the problem.
+________________________________________
+Console Logging
+One of the simplest debugging techniques is printing information to the console.
+Examples:
+console.log(pdfText);
+
+console.log(reportData);
+
+console.log(locator.count());
+Console logging is useful for:
+•	Verifying extracted values
+•	Checking object contents
+•	Confirming method execution
+•	Viewing API responses
+________________________________________
+page.pause()
+Pause the test and inspect the browser.
+Example:
+await page.pause();
+While paused you can:
+•	Inspect elements
+•	Test locators
+•	Click through the application
+•	Resume execution when ready
+This is one of the fastest ways to troubleshoot UI issues.
+________________________________________
+Playwright Inspector
+Run tests in debug mode to open the Playwright Inspector.
+Benefits:
+•	Step through each action
+•	View locators
+•	Watch assertions execute
+•	Inspect the page at every step
+________________________________________
+VS Code Debugger
+Use breakpoints in Visual Studio Code to pause execution.
+Benefits:
+•	Inspect variables
+•	View object values
+•	Follow code execution
+•	Step into methods
+•	Step over methods
+This is especially useful when debugging helper functions and parsing logic.
+________________________________________
+Trace Viewer
+Playwright can record a trace of each test.
+A trace includes:
+•	Screenshots
+•	DOM snapshots
+•	Network activity
+•	Console messages
+•	Every Playwright action
+The Trace Viewer is useful for reproducing failures after a test has completed.
+________________________________________
+Screenshots
+Capture screenshots when debugging.
+Example:
+await page.screenshot({
+    path: "debug.png",
+    fullPage: true
+});
+Screenshots help verify:
+•	Page layout
+•	Missing elements
+•	Incorrect navigation
+•	Unexpected dialogs
+________________________________________
+Inspecting Locators
+If a locator fails:
+1.	Verify the element exists.
+2.	Confirm the locator is correct.
+3.	Check if multiple elements match.
+4.	Verify the element is visible.
+5.	Verify the page has finished loading.
+Example:
+await expect(locator).toBeVisible();
+________________________________________
+Debugging PDF Parsing
+When parsing PDFs:
+•	Print the raw PDF text.
+•	Verify labels exactly match the report.
+•	Check for hidden spaces or line breaks.
+•	Test the regular expression against the extracted text.
+Example:
+console.log(pdfText);
+Most parsing issues are easier to solve after viewing the raw PDF text.
+________________________________________
+Debugging Download Issues
+If a download fails:
+•	Verify the download event is being awaited.
+•	Confirm the download button was clicked.
+•	Check the file path.
+•	Verify the PDF was saved successfully.
+•	Confirm the parser is reading the correct file.
+________________________________________
+Debugging Regular Expressions
+If a regex fails:
+•	Print the extracted text.
+•	Test the regex against a small section first.
+•	Verify spacing and line breaks.
+•	Check for optional fields.
+•	Return an empty string for optional values instead of undefined.
+________________________________________
+Common Mistakes
+Missing await
+Forgetting await can cause tests to continue before an action completes.
+________________________________________
+Wrong Locator
+A failing locator is often caused by:
+•	Incorrect text
+•	Multiple matching elements
+•	Hidden elements
+•	Dynamic page content
+________________________________________
+Debugging Too Many Problems at Once
+Fix one issue before moving on to the next.
+Changing multiple things at once makes it difficult to determine what solved the problem.
+________________________________________
+Lessons Learned from My First Automation Project
+•	Printing the raw PDF text made regex issues much easier to identify.
+•	Small formatting differences in PDFs can break regular expressions.
+•	Using page.pause() helped inspect UI elements and verify locators.
+•	Console logging was useful for confirming parsed values and object contents.
+•	The Playwright Trace Viewer helped understand failures after test execution.
+•	Breaking large problems into smaller pieces made debugging much more manageable.
+________________________________________
+Best Practices
+•	Start with the simplest debugging method first.
+•	Use console logging to inspect values.
+•	Verify locators before changing test logic.
+•	Inspect the raw data before modifying regex patterns.
+•	Make one change at a time.
+•	Remove temporary debugging code after fixing the issue.
+________________________________________
+Quick Summary
+Tool	Purpose
+console.log()	Print values for inspection
+page.pause()	Pause and inspect the browser
+VS Code Debugger	Step through code and inspect variables
+Playwright Inspector	Debug UI interactions
+Trace Viewer	Review completed test execution
+Screenshots	Capture the application's state
+expect()	Verify elements before interacting with them
+Raw PDF Text	Debug parsing and regular expressions
+

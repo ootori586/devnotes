@@ -1,0 +1,169 @@
+Playwright Project Structure
+Overview
+A well-organized Playwright project makes tests easier to read, maintain, and reuse. Each folder should have a single responsibility.
+A common project structure looks like this:
+project/
+│
+├── tests/
+├── pages/
+├── helpers/
+├── fixtures/
+├── data/
+│   └── downloads/
+├── utils/
+├── playwright.config.ts
+├── package.json
+└── tsconfig.json
+________________________________________
+Folder Responsibilities
+tests/
+Contains the actual test files.
+Examples:
+•	Login tests
+•	Report tests
+•	PDF download tests
+•	PDF parsing tests
+Tests should focus on what is being tested, not how the application works.
+________________________________________
+pages/
+Contains Page Object Models (POM).
+Each page object represents a page or dialog within the application.
+Example:
+pages/
+├── LoginPage.ts
+├── ReportsPage.ts
+└── FacilityPage.ts
+Responsibilities:
+•	Locators
+•	Clicking buttons
+•	Filling forms
+•	Selecting dropdowns
+•	Navigating pages
+Avoid placing assertions or business logic inside page objects.
+________________________________________
+helpers/
+Contains reusable helper functions.
+Examples:
+helpers/
+├── pdfHelper.ts
+├── dateHelper.ts
+└── fileHelper.ts
+Helpers are useful for:
+•	PDF parsing
+•	File handling
+•	Date formatting
+•	Common utility methods
+________________________________________
+fixtures/
+Contains custom Playwright fixtures.
+Examples:
+fixtures/
+└── testFixtures.ts
+Fixtures create reusable objects that are automatically available to tests.
+Examples:
+•	Page Objects
+•	Test users
+•	Authentication
+•	Shared setup
+________________________________________
+data/
+Stores files used during testing.
+Example:
+data/
+├── downloads/
+├── testData.json
+└── sampleFiles/
+Examples:
+•	Downloaded PDFs
+•	Import files
+•	JSON test data
+•	Sample documents
+________________________________________
+utils/
+Contains reusable utility functions that are not tied to a specific page.
+Examples:
+•	String utilities
+•	Random data generators
+•	Formatting methods
+________________________________________
+Configuration Files
+playwright.config.ts
+Main Playwright configuration.
+Typically contains:
+•	Browser selection
+•	Base URL
+•	Timeouts
+•	Reporters
+•	Screenshot settings
+•	Video settings
+________________________________________
+package.json
+Contains:
+•	Project dependencies
+•	npm scripts
+•	Playwright commands
+________________________________________
+tsconfig.json
+Contains TypeScript compiler settings.
+________________________________________
+Recommended Flow
+Test
+    ↓
+Page Object
+    ↓
+Helper (if needed)
+    ↓
+Application
+Example:
+PDF Test
+    ↓
+ReportsPage
+    ↓
+pdfHelper
+    ↓
+Assertions
+________________________________________
+Responsibilities
+Tests
+•	Verify application behavior
+•	Perform assertions
+Page Objects
+•	Interact with the UI
+•	Hide locator details
+Helpers
+•	Perform reusable logic
+•	Parse PDFs
+•	Format data
+Fixtures
+•	Provide shared setup
+•	Create reusable objects
+________________________________________
+Best Practices
+•	Keep each class focused on one responsibility.
+•	Avoid duplicate code.
+•	Store locators inside Page Objects.
+•	Place reusable logic inside helpers.
+•	Use fixtures for shared setup.
+•	Store downloaded files inside the data folder.
+•	Keep tests readable by separating UI interactions from validation logic.
+________________________________________
+Lessons Learned from My First Automation Project
+•	Separate PDF downloading from PDF parsing.
+•	Keep parsing logic in helper methods when it is reused.
+•	Store downloaded PDFs in a dedicated folder.
+•	Use Page Objects to reduce duplicated locator code.
+•	Organize tests by feature rather than putting everything into one file.
+•	A clean folder structure makes future maintenance much easier.
+________________________________________
+Quick Summary
+Folder	Purpose
+tests/	Test cases and assertions
+pages/	Page Object Models
+helpers/	Reusable helper methods
+fixtures/	Shared Playwright fixtures
+data/	Test data and downloaded files
+utils/	General utility functions
+playwright.config.ts	Playwright configuration
+package.json	Project dependencies and scripts
+tsconfig.json	TypeScript configuration
+

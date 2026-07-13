@@ -1,0 +1,156 @@
+PDF Parsing in Playwright
+Overview
+After downloading a PDF, the next step is extracting its contents so the values can be verified during automated testing.
+Rather than checking that a PDF exists, parsing allows the test to validate the actual report data, such as names, addresses, dates, phone numbers, and report metadata.
+________________________________________
+PDF Parsing Workflow
+Typical workflow:
+1.	Download the PDF.
+2.	Save the file.
+3.	Read the PDF text.
+4.	Extract values using regular expressions.
+5.	Store extracted values in an object.
+6.	Compare extracted values with the application's expected values.
+________________________________________
+Reading the PDF
+The parser reads the PDF and converts it into plain text.
+Example:
+const pdfText = await parser.getText(filePath);
+Once the text is available, regular expressions can locate and extract specific values.
+________________________________________
+Using Regular Expressions
+Regular expressions search the PDF text for known labels and return the corresponding values.
+Example:
+const cageCode =
+    pdfText.match(/CAGE Code:\s*(.+)/)?.[1]?.trim() ?? "";
+This searches for the label "CAGE Code:" and captures the value that follows.
+________________________________________
+Returning an Empty String
+When a field is optional, return an empty string instead of undefined.
+Example:
+const phone =
+    pdfText.match(/Phone:\s*(.+)/)?.[1]?.trim() ?? "";
+Using "" makes assertions simpler and avoids unnecessary null or undefined checks.
+________________________________________
+Parsing Multi-Line Data
+Some PDF values span multiple lines.
+Examples include:
+•	Mailing addresses
+•	Commercial carrier addresses
+•	Contact information
+These fields often require matching several lines instead of a single value.
+________________________________________
+Normalizing PDF Text
+PDF formatting can vary.
+Normalize the text before parsing.
+Example:
+const normalizedText = pdfText.replace(/\r\n/g, "\n");
+Normalization makes regular expressions more reliable.
+________________________________________
+Parsing Addresses
+Addresses usually contain:
+•	Street Address
+•	City
+•	State
+•	ZIP Code
+Instead of writing separate regex patterns everywhere, create a helper function that extracts the entire address block and returns an object.
+Example return value:
+{
+    streetAddress: "",
+    city: "",
+    state: "",
+    zipCode: ""
+}
+This keeps parsing code reusable and easier to maintain.
+________________________________________
+Parsing Phone Numbers
+Phone numbers are not always present.
+Always account for missing values.
+Example:
+const phone =
+    pdfText.match(phoneRegex)?.groups?.phone ?? "";
+Returning an empty string prevents test failures when no phone number exists.
+________________________________________
+Parsing Dates
+Dates often appear after a label.
+Example:
+const agreementDate =
+    pdfText.match(dateRegex)?.groups?.date ?? "";
+Always trim whitespace before returning values.
+________________________________________
+Using Objects
+Instead of creating dozens of variables, store extracted values inside an object.
+Example:
+const reportData = {
+    cageCode,
+    facilityName,
+    phone,
+    address,
+    agreementDate
+};
+Objects make assertions cleaner and easier to read.
+________________________________________
+Separating Responsibilities
+Keep each responsibility separate.
+Download Helper
+•	Downloads the PDF
+PDF Parser
+•	Reads the PDF
+•	Extracts values
+Test
+•	Compares expected values with parsed values
+Separating responsibilities makes the code easier to reuse and maintain.
+________________________________________
+Common Problems
+Regex returned undefined
+Possible causes:
+•	Label changed.
+•	Extra whitespace.
+•	Different line breaks.
+•	Optional value missing.
+Use:
+?? ""
+for optional fields.
+________________________________________
+Regex Captured Too Much
+Use non-greedy matching when appropriate.
+Example:
+(.+?)
+instead of
+(.+)
+________________________________________
+PDF Formatting Changed
+Normalize the text before applying regex.
+Check the raw PDF text if parsing suddenly stops working.
+________________________________________
+Address Parsing Failed
+Instead of matching individual fields separately, parse the address block first, then split it into components.
+This approach is usually easier to maintain.
+________________________________________
+Lessons Learned from My First Automation Ticket
+•	Always inspect the raw PDF text before writing a regular expression.
+•	Normalize line endings before parsing.
+•	Return empty strings for optional values.
+•	Use helper functions for repeated parsing logic.
+•	Store parsed values in objects instead of individual variables.
+•	Keep download logic separate from parsing logic.
+•	Test regular expressions against real PDF output.
+•	Small formatting differences in a PDF can break a regex, so verify the actual text before assuming the pattern is wrong.
+•	When debugging, print the extracted text first—it often reveals hidden spaces or line breaks causing the issue.
+________________________________________
+Best Practices
+•	Keep regex patterns simple.
+•	Reuse helper functions.
+•	Return consistent values.
+•	Normalize PDF text.
+•	Validate against actual report output.
+•	Separate downloading, parsing, and assertions.
+________________________________________
+Quick Summary
+Step	Purpose
+Download PDF	Save report locally
+Read PDF	Convert PDF to text
+Normalize Text	Standardize formatting
+Apply Regex	Extract values
+Store in Object	Organize parsed data
+Assert Values	Verify report contents

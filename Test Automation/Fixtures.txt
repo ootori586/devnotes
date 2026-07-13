@@ -1,0 +1,114 @@
+Fixtures in Playwright
+What are Fixtures?
+Fixtures are reusable objects or setup code that Playwright automatically provides to your tests. They help eliminate duplicate code by creating common resources before a test runs and cleaning them up afterward.
+Playwright includes several built-in fixtures, such as:
+•	page – Browser page used for automation.
+•	browser – Browser instance.
+•	context – Browser context (isolated browser session).
+•	request – API request context.
+Instead of creating these objects manually in every test, Playwright injects them automatically.
+Example:
+test('Open homepage', async ({ page }) => {
+    await page.goto('https://example.com');
+});
+In this example, page is a built-in fixture.
+________________________________________
+Why Use Fixtures?
+Fixtures make tests:
+•	Easier to read.
+•	Easier to maintain.
+•	More reusable.
+•	Less repetitive.
+•	More consistent across an entire test suite.
+If multiple tests require the same setup, place that setup in a fixture instead of copying it into every test.
+________________________________________
+Creating Custom Fixtures
+You can create your own fixtures by extending Playwright's built-in test object.
+Example:
+import { test as base } from '@playwright/test';
+import { ReportsPage } from '../pages/ReportsPage';
+
+export const test = base.extend<{
+    reportsPage: ReportsPage;
+}>({
+    reportsPage: async ({ page }, use) => {
+        await use(new ReportsPage(page));
+    },
+});
+Now every test automatically receives a reportsPage object.
+Example usage:
+test('Create report', async ({ reportsPage }) => {
+    await reportsPage.open();
+});
+________________________________________
+Passing Objects into Tests
+Fixtures allow custom objects to be passed directly into a test.
+Instead of writing:
+const reportsPage = new ReportsPage(page);
+inside every test, use a fixture:
+test('Generate PDF', async ({ reportsPage }) => {
+    await reportsPage.generatePdf();
+});
+This keeps tests shorter and easier to understand.
+You can pass:
+•	Page Objects
+•	Helper classes
+•	Configuration objects
+•	Test data
+•	Logged-in users
+•	API clients
+Anything that multiple tests share can become a fixture.
+________________________________________
+beforeEach() vs Fixtures
+Both beforeEach() and fixtures help reduce duplicate code, but they serve different purposes.
+Use beforeEach() when:
+•	Every test needs the same setup.
+•	You need to navigate to a page before each test.
+•	You log in before every test.
+•	You reset data before each test.
+Example:
+test.beforeEach(async ({ page }) => {
+    await page.goto('/reports');
+});
+________________________________________
+Use Fixtures when:
+•	Creating reusable objects.
+•	Sharing Page Objects.
+•	Creating helper utilities.
+•	Providing test data.
+•	Reusing setup across multiple files.
+Fixtures are generally more reusable than beforeEach() because they can be shared throughout your project.
+________________________________________
+Examples from My Project
+Example 1 – Page Object Fixture
+Instead of creating the page object in every test:
+const reportsPage = new ReportsPage(page);
+Create a fixture:
+reportsPage
+Then use:
+test('Download report', async ({ reportsPage }) => {
+    await reportsPage.downloadReport();
+});
+________________________________________
+Example 2 – PDF Parsing Helper
+A PDF parser helper could also be exposed through a fixture if many tests need it.
+Instead of repeatedly importing and creating helper objects, the fixture provides them automatically.
+________________________________________
+Example 3 – Report Data
+If several tests use the same report information, a fixture can provide a reusable report object instead of recreating it every time.
+________________________________________
+Best Practices
+•	Keep fixtures focused on one responsibility.
+•	Use fixtures for reusable objects and shared setup.
+•	Use beforeEach() for actions that every test should perform.
+•	Avoid placing large amounts of test logic inside fixtures.
+•	Name fixtures clearly so their purpose is obvious.
+________________________________________
+Quick Summary
+Use beforeEach()	Use Fixtures
+Navigate to a page	Create Page Objects
+Log in	Share helper classes
+Reset test data	Provide reusable test data
+Common setup for every test	Reuse objects across many tests
+Execute actions before each test	Inject reusable dependencies into tests
+Rule of Thumb: If you're performing actions before every test, use beforeEach(). If you're providing reusable objects, helpers, or data to tests, use fixtures.
